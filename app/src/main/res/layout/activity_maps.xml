@@ -41,7 +41,8 @@
             android:layout_weight="1"
             android:background="@drawable/custom_button"
             android:backgroundTint="@color/primary_color"
-            android:text="Login" />
+            android:text="Login"
+            />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -60,7 +61,7 @@
             android:id="@+id/editTextTextPersonName"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:background="@drawable/custom_input"
+            android:background="@drawable/custom_input_search"
             android:drawableStart="@drawable/custom_search_icon"
             android:drawablePadding="12dp"
             android:ems="10"
@@ -69,5 +70,9 @@
             android:focusable="auto"
             />
     </androidx.appcompat.widget.LinearLayoutCompat>
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragment_login"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
 </RelativeLayout>
