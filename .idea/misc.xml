@@ -13,9 +13,10 @@
         <entry key="app/src/main/res/drawable/ic_baseline_lock.xml" value="0.14629629629629629" />
         <entry key="app/src/main/res/drawable/ic_baseline_lock_focused.xml" value="0.30833333333333335" />
         <entry key="app/src/main/res/drawable/ic_baseline_search.xml" value="0.29814814814814816" />
-        <entry key="app/src/main/res/layout/activity_maps.xml" value="0.2115036231884058" />
+        <entry key="app/src/main/res/layout/activity_maps.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_blank.xml" value="0.16770833333333332" />
         <entry key="app/src/main/res/layout/fragment_login.xml" value="0.2418478260869565" />
+        <entry key="app/src/main/res/layout/fragment_register.xml" value="0.14336372847011145" />
       </map>
     </option>
   </component>

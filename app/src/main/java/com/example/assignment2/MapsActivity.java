@@ -54,15 +54,40 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         mMap.getUiSettings().setZoomControlsEnabled(true);
 
+        //config fragment
+        FragmentManager fm = getSupportFragmentManager();
+
+
         Button btnLogin = findViewById(R.id.btnLogin);
+        Button btnRegister = findViewById(R.id.btnRegister);
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentManager fm=getSupportFragmentManager();
-                FragmentTransaction ft=fm.beginTransaction();
-                ft.add(R.id.fragment_login,new Login());
-                Toast.makeText(MapsActivity.this, "Fragment is added!!!!!!", Toast.LENGTH_SHORT).show();
+                FragmentTransaction ft =
+                        fm.beginTransaction().setCustomAnimations(
+                                R.anim.slide_in,  // enter
+                                R.anim.fade_out,  // exit
+                                R.anim.fade_in,   // popEnter
+                                R.anim.slide_out  // popExit
+                        );
+
+                ft.add(R.id.fragment_login, new Login());
+                ft.addToBackStack(null);
+                ft.commit();
+            }
+        });
+        btnRegister.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentTransaction ft =
+                        fm.beginTransaction().setCustomAnimations(
+                                R.anim.slide_in,  // enter
+                                R.anim.fade_out,  // exit
+                                R.anim.fade_in,   // popEnter
+                                R.anim.slide_out  // popExit
+                        );
+                ft.add(R.id.fragment_register, new Register());
                 ft.addToBackStack(null);
                 ft.commit();
             }
