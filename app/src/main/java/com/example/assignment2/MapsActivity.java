@@ -1,5 +1,6 @@
 package com.example.assignment2;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
@@ -8,6 +9,7 @@ import androidx.fragment.app.FragmentTransaction;
 import android.os.Bundle;
 import android.text.Layout;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -23,6 +25,8 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.example.assignment2.databinding.ActivityMapsBinding;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -35,8 +39,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Button btnLogin, btnRegister;
     private ImageButton btnLogout;
     private LinearLayoutCompat wrapperBtn;
-    private RelativeLayout  wrapperSearch;
+    private RelativeLayout wrapperSearch;
     private EditText edtSearch;
+    private BottomNavigationView bottomNavigationView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +68,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         btnLogin = findViewById(R.id.map_btnLogin);
         btnRegister = findViewById(R.id.map_btnRegister);
         btnLogout = findViewById(R.id.map_btnLogout);
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,7 +82,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         );
 
                 ft.add(R.id.fragment_login, new Login());
-                ft.addToBackStack(null);
                 ft.commit();
             }
         });
@@ -90,7 +96,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 R.anim.slide_out  // popExit
                         );
                 ft.add(R.id.fragment_register, new Register());
-                ft.addToBackStack(null);
                 ft.commit();
             }
         });
@@ -99,9 +104,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View v) {
                 mAuth.signOut();
-                UpdateUIUserLogin(false);
+                UpdateUIUserLogin();
             }
         });
+
+
+        bottomNavigationView.setOnItemSelectedListener(
+                new NavigationBarView.OnItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.nvb_home:
+                                Toast.makeText(MapsActivity.this, "Home", Toast.LENGTH_SHORT)
+                                        .show();
+                                break;
+                            case R.id.nvb_campaigns:
+                                Toast.makeText(MapsActivity.this, "Campaign", Toast.LENGTH_SHORT)
+                                        .show();
+                                break;
+                            case R.id.nvb_report:
+                                Toast.makeText(MapsActivity.this, "Report", Toast.LENGTH_SHORT)
+                                        .show();
+                                break;
+                        }
+                        return true;
+                    }
+                });
     }
 
     /**
@@ -133,15 +161,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onStart() {
         Log.i("onStart", "onStart");
         super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser == null) {
-            Log.i("currentUser", "No User");
-            UpdateUIUserLogin(false);
-        } else {
-            Log.i("currentUser", currentUser.toString());
-            UpdateUIUserLogin(true);
-        }
+
+        UpdateUIUserLogin();
 
     }
 
@@ -171,11 +192,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     @Override
-    public void UpdateUIUserLogin(Boolean status) {
-        if (status){
+    public void UpdateUIUserLogin() {
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
             wrapperBtn.setVisibility(View.GONE);
             btnLogout.setVisibility(View.VISIBLE);
-        }else{
+        } else {
             wrapperBtn.setVisibility(View.VISIBLE);
             btnLogout.setVisibility(View.GONE);
         }

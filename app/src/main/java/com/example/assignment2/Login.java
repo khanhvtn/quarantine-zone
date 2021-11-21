@@ -44,7 +44,7 @@ public class Login extends Fragment {
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getActivity().onBackPressed();
+               closeLogin();
             }
         });
         btnLogin.setOnClickListener(new View.OnClickListener() {
@@ -59,14 +59,12 @@ public class Login extends Fragment {
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if (task.isSuccessful()) {
                                     // Sign in success, update UI with the signed-in user's information
-                                    Log.i("Login", "signInWithEmail:success");
-                                    IUpdateUIAuth listener = (IUpdateUIAuth)getActivity();
-                                    listener.UpdateUIUserLogin(true);
-                                    getActivity().onBackPressed();
+                                    IUpdateUIAuth listener = (IUpdateUIAuth) getActivity();
+                                    listener.UpdateUIUserLogin();
+                                    closeLogin();
                                 } else {
                                     // If sign in fails, display a message to the user.
-                                    Log.e("Login", "signInWithEmail:failure", task.getException());
-                                    Toast.makeText(v.getContext(),"Authentication failed.",
+                                    Toast.makeText(v.getContext(), "Authentication failed.",
                                             Toast.LENGTH_SHORT).show();
                                 }
                             }
@@ -74,6 +72,17 @@ public class Login extends Fragment {
             }
         });
         return v;
+    }
+
+    public void closeLogin(){
+        FragmentManager fragmentManager =
+                getParentFragmentManager();
+        fragmentManager.beginTransaction().setCustomAnimations(
+                R.anim.slide_in,  // enter
+                R.anim.fade_out,  // exit
+                R.anim.fade_in,   // popEnter
+                R.anim.slide_out  // popExit
+        ).remove(fragmentManager.findFragmentById(R.id.fragment_login)).commit();
     }
 
 
