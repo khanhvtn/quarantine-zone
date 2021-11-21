@@ -14,7 +14,7 @@
         tools:context=".MapsActivity" />
 
     <androidx.appcompat.widget.LinearLayoutCompat
-        android:id="@+id/wrapperBtn"
+        android:id="@+id/map_wrapperBtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
@@ -26,9 +26,9 @@
 
 
         <Button
-            android:id="@+id/btnRegister"
+            android:id="@+id/map_btnRegister"
             android:layout_width="wrap_content"
-            android:layout_height="45dp"
+            android:layout_height="50dp"
             android:layout_marginRight="12dp"
             android:layout_weight="1"
             android:background="@drawable/custom_button"
@@ -36,9 +36,9 @@
             android:text="Register" />
 
         <Button
-            android:id="@+id/btnLogin"
+            android:id="@+id/map_btnLogin"
             android:layout_width="wrap_content"
-            android:layout_height="45dp"
+            android:layout_height="50dp"
             android:layout_weight="1"
             android:background="@drawable/custom_button"
             android:backgroundTint="@color/primary_color"
@@ -47,30 +47,38 @@
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
-    <androidx.appcompat.widget.LinearLayoutCompat
-        android:id="@+id/wrapperSearchInput"
+
+    <RelativeLayout
+        android:id="@+id/map_wrapperSearchInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/wrapperBtn"
-        android:layout_margin="10dp"
-        android:orientation="horizontal">
-
+        android:layout_below="@+id/map_wrapperBtn"
+        android:layout_margin="10dp">
         <EditText
-            android:paddingStart="20dp"
-            android:paddingHorizontal="20dp"
-            android:textSize="20dp"
-            android:id="@+id/editTextTextPersonName"
+            android:id="@+id/map_edtSearch"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:background="@drawable/custom_input_search"
             android:drawableStart="@drawable/custom_search_icon"
             android:drawablePadding="12dp"
             android:ems="10"
+            android:focusable="auto"
             android:hint="Search your location"
             android:inputType="text"
-            android:focusable="auto"
-            />
-    </androidx.appcompat.widget.LinearLayoutCompat>
+            android:paddingHorizontal="20dp"
+            android:paddingStart="20dp"
+            android:textSize="20dp" />
+        <ImageButton
+            android:visibility="gone"
+            android:layout_marginRight="10dp"
+            android:background="@android:color/transparent"
+            android:id="@+id/map_btnLogout"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/ic_logout"
+            android:layout_width="50dp"
+            android:layout_height="50dp"/>
+
+    </RelativeLayout>
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_login"

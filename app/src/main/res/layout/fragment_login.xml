@@ -24,9 +24,8 @@
         android:layout_marginHorizontal="30dp"
         android:orientation="vertical">
 
-
         <EditText
-            android:id="@+id/edtEmail"
+            android:id="@+id/login_edtEmail"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_marginBottom="20dp"
@@ -39,7 +38,7 @@
             android:paddingHorizontal="20dp" />
 
         <EditText
-            android:id="@+id/edtPassword"
+            android:id="@+id/login_edtPassword"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_marginBottom="20dp"
@@ -52,7 +51,7 @@
             android:paddingHorizontal="20dp" />
 
         <Button
-            android:id="@+id/btnCloseLogin"
+            android:id="@+id/login_btnLogin"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:backgroundTint="@color/primary_color"
