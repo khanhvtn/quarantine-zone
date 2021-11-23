@@ -44,7 +44,7 @@ public class Login extends Fragment {
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               closeLogin();
+                closeLogin();
             }
         });
         btnLogin.setOnClickListener(new View.OnClickListener() {
@@ -58,9 +58,6 @@ public class Login extends Fragment {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if (task.isSuccessful()) {
-                                    // Sign in success, update UI with the signed-in user's information
-                                    IUpdateUIAuth listener = (IUpdateUIAuth) getActivity();
-                                    listener.UpdateUIUserLogin();
                                     closeLogin();
                                 } else {
                                     // If sign in fails, display a message to the user.
@@ -74,7 +71,7 @@ public class Login extends Fragment {
         return v;
     }
 
-    public void closeLogin(){
+    public void closeLogin() {
         FragmentManager fragmentManager =
                 getParentFragmentManager();
         fragmentManager.beginTransaction().setCustomAnimations(
@@ -82,7 +79,7 @@ public class Login extends Fragment {
                 R.anim.fade_out,  // exit
                 R.anim.fade_in,   // popEnter
                 R.anim.slide_out  // popExit
-        ).remove(fragmentManager.findFragmentById(R.id.fragment_login)).commit();
+        ).replace(R.id.frame_layout, new Map()).commit();
     }
 
 

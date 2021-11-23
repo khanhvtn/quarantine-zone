@@ -7,7 +7,7 @@
     android:background="@color/white"
     >
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:text="Back"
         android:id="@+id/register_btnBack"
         android:drawableStart="@drawable/ic_baseline_arrow_back_ios"
@@ -26,7 +26,7 @@
         android:orientation="vertical">
 
 
-        <EditText
+        <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/register_edtFullName"
             android:layout_width="match_parent"
             android:layout_height="60dp"
@@ -38,7 +38,7 @@
             android:hint="Full Name"
             android:inputType="text"
             android:paddingHorizontal="20dp" />
-        <EditText
+        <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/register_edtEmail"
             android:layout_width="match_parent"
             android:layout_height="60dp"
@@ -51,7 +51,7 @@
             android:inputType="text"
             android:paddingHorizontal="20dp" />
 
-        <EditText
+        <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/register_edtPassword"
             android:layout_width="match_parent"
             android:layout_height="60dp"
@@ -63,7 +63,7 @@
             android:hint="Password"
             android:inputType="textPassword"
             android:paddingHorizontal="20dp" />
-        <EditText
+        <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/register_edtPhone"
             android:layout_width="match_parent"
             android:layout_height="60dp"
@@ -75,7 +75,7 @@
             android:hint="Phone"
             android:inputType="text"
             android:paddingHorizontal="20dp" />
-        <EditText
+        <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/register_edtAddress"
             android:layout_width="match_parent"
             android:layout_height="60dp"
@@ -88,10 +88,11 @@
             android:inputType="text"
             android:paddingHorizontal="20dp" />
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/register_btnRegister"
             android:layout_width="match_parent"
             android:layout_height="60dp"
+            android:background="@drawable/custom_button"
             android:backgroundTint="@color/primary_color"
             android:text="Register" />
     </LinearLayout>

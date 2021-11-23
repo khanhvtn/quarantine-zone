@@ -6,7 +6,7 @@
     android:background="@color/white"
     tools:context=".Login">
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:text="Back"
         android:id="@+id/login_btnBack"
         android:drawableStart="@drawable/ic_baseline_arrow_back_ios"
@@ -24,7 +24,7 @@
         android:layout_marginHorizontal="30dp"
         android:orientation="vertical">
 
-        <EditText
+        <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/login_edtEmail"
             android:layout_width="match_parent"
             android:layout_height="60dp"
@@ -37,7 +37,7 @@
             android:inputType="text"
             android:paddingHorizontal="20dp" />
 
-        <EditText
+        <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/login_edtPassword"
             android:layout_width="match_parent"
             android:layout_height="60dp"
@@ -50,7 +50,7 @@
             android:inputType="textPassword"
             android:paddingHorizontal="20dp" />
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/login_btnLogin"
             android:layout_width="match_parent"
             android:layout_height="60dp"

@@ -51,8 +51,6 @@ public class Register extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
-        //Get activity
-        listener = (IUpdateUIAuth) getActivity();
 
         //Listener
         btnBack.setOnClickListener(new View.OnClickListener() {
@@ -89,7 +87,6 @@ public class Register extends Fragment {
                                                     public void onComplete(
                                                             @NonNull Task<Void> task) {
                                                         if (task.isSuccessful()) {
-                                                            listener.UpdateUIUserLogin();
                                                             Toast.makeText(v.getContext(),
                                                                     "Register Successful. Please Login!!!",
                                                                     Toast.LENGTH_SHORT).show();
@@ -144,6 +141,6 @@ public class Register extends Fragment {
                 R.anim.fade_out,  // exit
                 R.anim.fade_in,   // popEnter
                 R.anim.slide_out  // popExit
-        ).remove(fragmentManager.findFragmentById(R.id.fragment_register)).commit();
+        ).replace(R.id.frame_layout, new Map()).commit();
     }
 }
