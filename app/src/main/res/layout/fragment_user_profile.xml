@@ -3,31 +3,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Register"
-    android:background="@color/white"
-    >
+    tools:context=".UserProfile">
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:text="Back"
-        android:id="@+id/register_btnBack"
-        android:drawableStart="@drawable/ic_baseline_arrow_back_ios"
-        android:layout_marginLeft="30dp"
-        android:layout_marginTop="20dp"
-        android:background="@android:color/transparent"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-
-
-    <LinearLayout
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:layout_marginHorizontal="30dp"
         android:orientation="vertical">
-
-
         <androidx.appcompat.widget.AppCompatEditText
-            android:id="@+id/register_edtFullName"
+            android:enabled="false"
+            android:id="@+id/profile_edtFullName"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_marginBottom="20dp"
@@ -39,32 +25,8 @@
             android:inputType="text"
             android:paddingHorizontal="20dp" />
         <androidx.appcompat.widget.AppCompatEditText
-            android:id="@+id/register_edtEmail"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_marginBottom="20dp"
-            android:background="@drawable/custom_input"
-            android:drawableStart="@drawable/custom_email_icon"
-            android:drawablePadding="10dp"
-            android:ems="10"
-            android:hint="Email"
-            android:inputType="text"
-            android:paddingHorizontal="20dp" />
-
-        <androidx.appcompat.widget.AppCompatEditText
-            android:id="@+id/register_edtPassword"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_marginBottom="20dp"
-            android:background="@drawable/custom_input"
-            android:drawableStart="@drawable/custom_lock_icon"
-            android:drawablePadding="10dp"
-            android:ems="10"
-            android:hint="Password"
-            android:inputType="textPassword"
-            android:paddingHorizontal="20dp" />
-        <androidx.appcompat.widget.AppCompatEditText
-            android:id="@+id/register_edtPhone"
+            android:enabled="false"
+            android:id="@+id/profile_edtPhone"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_marginBottom="20dp"
@@ -76,7 +38,8 @@
             android:inputType="text"
             android:paddingHorizontal="20dp" />
         <androidx.appcompat.widget.AppCompatEditText
-            android:id="@+id/register_edtAddress"
+            android:enabled="false"
+            android:id="@+id/profile_edtAddress"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_marginBottom="20dp"
@@ -89,13 +52,22 @@
             android:paddingHorizontal="20dp" />
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/register_btnRegister"
+            android:id="@+id/profile_btnChange"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:padding="10dp"
             android:background="@drawable/custom_button"
             android:backgroundTint="@color/primary_color"
-            android:text="Register" />
-    </LinearLayout>
+            android:layout_marginBottom="20dp"
+            android:text="Change" />
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/profile_btnLogout"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:padding="10dp"
+            android:background="@drawable/custom_button"
+            android:backgroundTint="@android:color/darker_gray"
+            android:text="Logout" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
 </RelativeLayout>

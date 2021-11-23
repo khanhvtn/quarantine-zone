@@ -24,9 +24,11 @@
         <entry key="app/src/main/res/drawable/rounded_corner.xml" value="0.321025641025641" />
         <entry key="app/src/main/res/layout/activity_maps.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_blank.xml" value="0.16770833333333332" />
+        <entry key="app/src/main/res/layout/fragment_create_campaign.xml" value="0.1703125" />
         <entry key="app/src/main/res/layout/fragment_login.xml" value="0.2418478260869565" />
         <entry key="app/src/main/res/layout/fragment_map.xml" value="0.23052536231884058" />
         <entry key="app/src/main/res/layout/fragment_register.xml" value="0.14336372847011145" />
+        <entry key="app/src/main/res/layout/fragment_user_profile.xml" value="0.3098958333333333" />
         <entry key="app/src/main/res/menu/bottom_nav_menu.xml" value="0.16458333333333333" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.1296875" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.1296875" />

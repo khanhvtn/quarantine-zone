@@ -9,7 +9,9 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -23,20 +25,27 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
-public class Map extends Fragment  implements IUpdateUIAuth{
+public class Map extends Fragment {
 
+    private FirebaseFirestore db;
     private GoogleMap mMap;
     private Button btnLogin, btnRegister;
     private ImageButton btnLogout;
     private LinearLayoutCompat wrapperBtn;
-    private RelativeLayout wrapperSearch;
     private EditText edtSearch;
     private FirebaseAuth mAuth;
     private FragmentManager fm;
+    private IUpdateUIAuth listener;
+    private BottomNavigationView bottomNavigationView;
 
     public Map() {
     }
@@ -47,21 +56,28 @@ public class Map extends Fragment  implements IUpdateUIAuth{
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_map, container, false);
 
+        //firebase
+        db = FirebaseFirestore.getInstance();
 
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
 
         //declare fields
         wrapperBtn = view.findViewById(R.id.map_wrapperBtn);
-        wrapperSearch = view.findViewById(R.id.map_wrapperSearchInput);
         edtSearch = view.findViewById(R.id.map_edtSearch);
         btnLogin = view.findViewById(R.id.map_btnLogin);
         btnRegister = view.findViewById(R.id.map_btnRegister);
-        btnLogout = view.findViewById(R.id.map_btnLogout);
+        bottomNavigationView = getActivity().findViewById(R.id.bottom_navigation);
 
         //config fragment
-
         fm = getParentFragmentManager();
+        FragmentTransaction ft =
+                fm.beginTransaction().setCustomAnimations(
+                        R.anim.slide_in,  // enter
+                        R.anim.fade_out,  // exit
+                        R.anim.fade_in,   // popEnter
+                        R.anim.slide_out  // popExit
+                );
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,26 +97,11 @@ public class Map extends Fragment  implements IUpdateUIAuth{
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentTransaction ft =
-                        fm.beginTransaction().setCustomAnimations(
-                                R.anim.slide_in,  // enter
-                                R.anim.fade_out,  // exit
-                                R.anim.fade_in,   // popEnter
-                                R.anim.slide_out  // popExit
-                        );
+
                 ft.replace(R.id.frame_layout, new Register());
                 ft.commit();
             }
         });
-
-        btnLogout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mAuth.signOut();
-                UpdateUIUserLogin();
-            }
-        });
-
 
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.google_map);
@@ -115,6 +116,21 @@ public class Map extends Fragment  implements IUpdateUIAuth{
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
                 mMap.getUiSettings().setZoomControlsEnabled(true);
                 mMap.getUiSettings().setMyLocationButtonEnabled(true);
+
+
+                //set onClick Map
+                mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+                    @Override
+                    public void onMapClick(LatLng latLng) {
+                        Bundle result = new Bundle();
+                        result.putDouble("latitude", latLng.latitude);
+                        result.putDouble("longitude", latLng.longitude);
+                        CreateCampaign createCampaign = new CreateCampaign();
+                        createCampaign.setArguments(result);
+                        ft.replace(R.id.frame_layout, createCampaign);
+                        ft.commit();
+                    }
+                });
             }
         });
         return view;
@@ -122,21 +138,62 @@ public class Map extends Fragment  implements IUpdateUIAuth{
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.i("Map", "OnCreate");
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
+        Log.i("Map", "OnStart");
         UpdateUIUserLogin();
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.i("Map", "OnDestroy");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.i("Map", "OnStop");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.i("Map", "OnPause");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
     public void UpdateUIUserLogin() {
-        // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser != null) {
+        listener = (IUpdateUIAuth) getActivity();
+        if (listener.getCurrentUser() != null) {
             wrapperBtn.setVisibility(View.GONE);
-            btnLogout.setVisibility(View.VISIBLE);
         } else {
-            wrapperBtn.setVisibility(View.VISIBLE);
-            btnLogout.setVisibility(View.GONE);
+            FirebaseUser currentUser = mAuth.getCurrentUser();
+            if (currentUser != null) {
+                wrapperBtn.setVisibility(View.GONE);
+                db.collection("users").document(currentUser.getUid()).get().addOnSuccessListener(
+                        new OnSuccessListener<DocumentSnapshot>() {
+                            @Override
+                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                User user = documentSnapshot.toObject(User.class);
+                                listener.setCurrentUser(user);
+                                listener.UpdateUIUserLogin();
+                            }
+                        });
+            } else {
+                wrapperBtn.setVisibility(View.VISIBLE);
+            }
+
         }
     }
 }

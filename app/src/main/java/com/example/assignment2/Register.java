@@ -27,7 +27,8 @@ public class Register extends Fragment {
     private FirebaseAuth mAuth;
     private Button btnRegister, btnBack;
     private EditText edtFullName, edtEmail, edtPassword, edtPhone, edtAddress;
-    IUpdateUIAuth listener;
+    private IUpdateUIAuth listener;
+
 
     public Register() {
         // Required empty public constructor
@@ -51,12 +52,15 @@ public class Register extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
+        //get activity
+        listener = (IUpdateUIAuth) getActivity();
+
 
         //Listener
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               closeRegister();
+                closeRegister();
             }
         });
 
@@ -77,16 +81,20 @@ public class Register extends Fragment {
                             new OnCompleteListener<AuthResult>() {
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
+                                    String userId = task.getResult().getUser().getUid();
                                     User newUser = new User(fullName, email, phone, address);
+                                    newUser.setUserId(userId);
                                     if (task.isSuccessful()) {
                                         db.collection("users")
-                                                .document(task.getResult().getUser().getUid())
+                                                .document(userId)
                                                 .set(newUser).addOnCompleteListener(
                                                 new OnCompleteListener<Void>() {
                                                     @Override
                                                     public void onComplete(
                                                             @NonNull Task<Void> task) {
                                                         if (task.isSuccessful()) {
+                                                            listener.setCurrentUser(newUser);
+                                                            listener.UpdateUIUserLogin();
                                                             Toast.makeText(v.getContext(),
                                                                     "Register Successful. Please Login!!!",
                                                                     Toast.LENGTH_SHORT).show();
@@ -133,7 +141,7 @@ public class Register extends Fragment {
         return null;
     }
 
-    public void closeRegister(){
+    public void closeRegister() {
         FragmentManager fragmentManager =
                 getParentFragmentManager();
         fragmentManager.beginTransaction().setCustomAnimations(
