@@ -1,5 +1,6 @@
 package com.example.assignment2;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -11,13 +12,11 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.RelativeLayout;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -25,9 +24,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -44,7 +41,7 @@ public class Map extends Fragment {
     private EditText edtSearch;
     private FirebaseAuth mAuth;
     private FragmentManager fm;
-    private IUpdateUIAuth listener;
+    private IMapManagement listener;
     private BottomNavigationView bottomNavigationView;
 
     public Map() {
@@ -122,13 +119,10 @@ public class Map extends Fragment {
                 mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
                     @Override
                     public void onMapClick(LatLng latLng) {
-                        Bundle result = new Bundle();
-                        result.putDouble("latitude", latLng.latitude);
-                        result.putDouble("longitude", latLng.longitude);
-                        CreateCampaign createCampaign = new CreateCampaign();
-                        createCampaign.setArguments(result);
-                        ft.replace(R.id.frame_layout, createCampaign);
-                        ft.commit();
+                        Intent intent = new Intent(getContext(), CreateCampaignActivity.class);
+                        intent.putExtra("latitude", latLng.latitude);
+                        intent.putExtra("longitude", latLng.longitude);
+                        startActivity(intent);
                     }
                 });
             }
@@ -174,7 +168,7 @@ public class Map extends Fragment {
     }
 
     public void UpdateUIUserLogin() {
-        listener = (IUpdateUIAuth) getActivity();
+        listener = (IMapManagement) getActivity();
         if (listener.getCurrentUser() != null) {
             wrapperBtn.setVisibility(View.GONE);
         } else {

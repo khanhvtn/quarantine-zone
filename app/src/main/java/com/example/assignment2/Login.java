@@ -6,7 +6,6 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,7 +25,7 @@ public class Login extends Fragment {
     private FirebaseAuth mAuth;
     private Button btnBack, btnLogin;
     private EditText edtEmail, edtPassword;
-    private IUpdateUIAuth listener;
+    private IMapManagement listener;
     private FirebaseFirestore db;
 
     public Login() {
@@ -47,7 +46,7 @@ public class Login extends Fragment {
         edtEmail = v.findViewById(R.id.login_edtEmail);
         edtPassword = v.findViewById(R.id.login_edtPassword);
         //get activity
-        listener = (IUpdateUIAuth) getActivity();
+        listener = (IMapManagement) getActivity();
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

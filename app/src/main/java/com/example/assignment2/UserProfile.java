@@ -16,7 +16,6 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 
@@ -26,7 +25,7 @@ public class UserProfile extends Fragment {
     private AppCompatButton btnChange, btnLogout;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
-    private IUpdateUIAuth listener;
+    private IMapManagement listener;
     private String mode = "view";
 
 
@@ -52,7 +51,7 @@ public class UserProfile extends Fragment {
                 getParentFragmentManager();
 
         //get activity
-        listener = (IUpdateUIAuth) getActivity();
+        listener = (IMapManagement) getActivity();
 
         //set listener
         btnLogout.setOnClickListener(new View.OnClickListener() {
@@ -61,12 +60,7 @@ public class UserProfile extends Fragment {
                 mAuth.signOut();
                 listener.setCurrentUser(null);
                 listener.UpdateUIUserLogin();
-                fragmentManager.beginTransaction().setCustomAnimations(
-                        R.anim.slide_in,  // enter
-                        R.anim.fade_out,  // exit
-                        R.anim.fade_in,   // popEnter
-                        R.anim.slide_out  // popExit
-                ).replace(R.id.frame_layout, new Map()).commit();
+                listener.switchFragmentInMainActivity(new Map());
             }
         });
 
@@ -112,7 +106,7 @@ public class UserProfile extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        IUpdateUIAuth listener = (IUpdateUIAuth) getActivity();
+        IMapManagement listener = (IMapManagement) getActivity();
         User user = listener.getCurrentUser();
         updateEdtText(user);
 

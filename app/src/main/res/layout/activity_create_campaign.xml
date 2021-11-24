@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".CreateCampaignActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="20dp"
+        >
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/crCam_btnBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="37dp"
+            android:layout_marginTop="25dp"
+            android:background="@android:color/transparent"
+            android:drawableStart="@drawable/ic_baseline_arrow_back_ios"
+            android:text="Back"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/crCam_btnBack"
+            android:layout_centerInParent="true"
+            android:layout_marginHorizontal="30dp"
+            android:layout_marginStart="37dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="37dp"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/crCam_btnBack">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:text="New Campaign"
+                android:textAlignment="center"
+                android:textSize="30dp"
+                android:textStyle="bold" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/crCam_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="189dp"
+                    android:layout_marginBottom="20dp"
+                    android:src="@drawable/app_logo" />
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_below="@+id/crCam_image"
+                    android:layout_centerInParent="true"
+                    android:orientation="horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/crCam_btnChangeImage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+
+                        android:background="@drawable/custom_button"
+                        android:drawableStart="@drawable/ic_add_photo"
+                        android:drawablePadding="10dp"
+                        android:padding="10dp"
+                        android:text="Change" />
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:layout_marginLeft="20dp"
+                        android:visibility="gone"
+                        android:id="@+id/crCam_btnRemoveImage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:layout_below="@+id/crCam_image"
+                        android:background="@drawable/custom_button"
+                        android:backgroundTint="@color/secondary_color"
+                        android:drawableStart="@drawable/ic_remove_photo"
+                        android:drawablePadding="10dp"
+                        android:padding="10dp"
+                        android:text="Change" />
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+            </RelativeLayout>
+
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/crCam_edtCampaignName"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/custom_input"
+                android:ems="10"
+                android:hint="Campaign Name"
+                android:inputType="text"
+                android:paddingHorizontal="20dp" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/crCam_edtOrganization"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/custom_input"
+                android:ems="10"
+                android:hint="Organization"
+                android:inputType="text"
+                android:paddingHorizontal="20dp" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/crCam_edtStartDate"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/custom_input"
+                android:ems="10"
+                android:hint="Start Date"
+                android:inputType="date"
+                android:paddingHorizontal="20dp" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/crCam_edtDescription"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/custom_input"
+                android:ems="10"
+                android:hint="Description"
+                android:inputType="textMultiLine"
+                android:paddingHorizontal="20dp" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/crCam_btnCreate"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:background="@drawable/custom_button"
+                android:backgroundTint="@color/primary_color"
+                android:padding="10dp"
+                android:text="Create" />
+        </LinearLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</ScrollView>

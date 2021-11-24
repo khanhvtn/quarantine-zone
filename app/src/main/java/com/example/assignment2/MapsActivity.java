@@ -2,19 +2,18 @@ package com.example.assignment2;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
-import com.google.android.material.bottomnavigation.BottomNavigationItemView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
 
-public class MapsActivity extends AppCompatActivity implements IUpdateUIAuth {
+public class MapsActivity extends AppCompatActivity implements IMapManagement {
 
     private FirebaseAuth mAuth;
     private BottomNavigationView bottomNavigationView;
@@ -30,9 +29,10 @@ public class MapsActivity extends AppCompatActivity implements IUpdateUIAuth {
         mAuth = FirebaseAuth.getInstance();
 
         //add map fragment to activity
+        Fragment mapFragment = new Map();
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.frame_layout, new Map())
+                .replace(R.id.frame_layout, mapFragment, mapFragment.getClass().toString())
                 .commit();
         bottomNavigationView = findViewById(R.id.bottom_navigation);
 
@@ -43,16 +43,7 @@ public class MapsActivity extends AppCompatActivity implements IUpdateUIAuth {
                     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                         switch (item.getItemId()) {
                             case R.id.nvb_home:
-                                getSupportFragmentManager()
-                                        .beginTransaction()
-                                        .setCustomAnimations(
-                                                R.anim.slide_in,  // enter
-                                                R.anim.fade_out,  // exit
-                                                R.anim.fade_in,   // popEnter
-                                                R.anim.slide_out  // popExit
-                                        )
-                                        .replace(R.id.frame_layout, new Map())
-                                        .commit();
+                                switchFragmentInMainActivity(new Map());
                                 break;
                             case R.id.nvb_campaigns:
                                 Toast.makeText(MapsActivity.this, "Campaign", Toast.LENGTH_SHORT)
@@ -63,16 +54,7 @@ public class MapsActivity extends AppCompatActivity implements IUpdateUIAuth {
                                         .show();
                                 break;
                             case R.id.nvb_profile:
-                                getSupportFragmentManager()
-                                        .beginTransaction()
-                                        .setCustomAnimations(
-                                                R.anim.slide_in,  // enter
-                                                R.anim.fade_out,  // exit
-                                                R.anim.fade_in,   // popEnter
-                                                R.anim.slide_out  // popExit
-                                        )
-                                        .replace(R.id.frame_layout, new UserProfile())
-                                        .commit();
+                                switchFragmentInMainActivity(new UserProfile());
                                 break;
                         }
                         return true;
@@ -137,5 +119,23 @@ public class MapsActivity extends AppCompatActivity implements IUpdateUIAuth {
     @Override
     public void setCurrentUser(User user) {
         currentUSer = user;
+    }
+
+    @Override
+    public void switchFragmentInMainActivity(Fragment fragment) {
+        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.frame_layout);
+        if(!fragment.getClass().toString().equals(currentFragment.getTag()))
+        {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .setCustomAnimations(
+                            R.anim.slide_in,  // enter
+                            R.anim.fade_out,  // exit
+                            R.anim.fade_in,   // popEnter
+                            R.anim.slide_out  // popExit
+                    )
+                    .replace(R.id.frame_layout, fragment, fragment.getClass().toString())
+                    .commit();
+        }
     }
 }

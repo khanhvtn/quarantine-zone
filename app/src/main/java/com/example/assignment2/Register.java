@@ -5,7 +5,6 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,7 +26,7 @@ public class Register extends Fragment {
     private FirebaseAuth mAuth;
     private Button btnRegister, btnBack;
     private EditText edtFullName, edtEmail, edtPassword, edtPhone, edtAddress;
-    private IUpdateUIAuth listener;
+    private IMapManagement listener;
 
 
     public Register() {
@@ -53,7 +52,7 @@ public class Register extends Fragment {
         db = FirebaseFirestore.getInstance();
 
         //get activity
-        listener = (IUpdateUIAuth) getActivity();
+        listener = (IMapManagement) getActivity();
 
 
         //Listener
