@@ -1,32 +1,74 @@
 package com.example.assignment2;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContract;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatEditText;
 import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.appcompat.widget.AppCompatImageView;
+import androidx.core.app.ActivityOptionsCompat;
+import androidx.core.content.FileProvider;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
 
+import com.bumptech.glide.Glide;
+
+import java.io.File;
+import java.net.URI;
 import java.util.Calendar;
 
 public class CreateCampaignActivity extends AppCompatActivity {
+    private static final String ACTIVITY_TAG = "CreateCampaign";
+    private static final int REQUEST_ID_READ_WRITE_PERMISSION = 99;
+    private static final int REQUEST_ID_IMAGE_CAPTURE = 100;
+    private static final int REQUEST_ID_VIDEO_CAPTURE = 101;
     private AppCompatButton crCamBtnBack, crCamBtnCreate, crCamBtnChangeImage, crCamBtnRemoveImage;
     private AppCompatImageButton crCamBtnPickDate;
     private AppCompatEditText crCamEdtCampaignName, crCamEdtOrganization, crCamEdtStartDate,
             crCamEdtDescription;
-    private AppCompatImageView crCamImage;
+    private AppCompatImageView crCamImageView;
     private int lastSelectedYear, lastSelectedMonth, lastSelectedDayOfMonth;
+    private ActivityResultLauncher<Uri> captureImageLauncher;
+    private Uri imageUri;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().hide();
         setContentView(R.layout.activity_create_campaign);
+
+        //create temporary image
+        File newFile = new File(this.getFilesDir(), "default_image.jpg");
+        imageUri = FileProvider
+                .getUriForFile(this, BuildConfig.APPLICATION_ID + ".provider", newFile);
+
+        //set activity result launcher
+        captureImageLauncher = registerForActivityResult(new ActivityResultContracts.TakePicture(),
+                new ActivityResultCallback<Boolean>() {
+                    @Override
+                    public void onActivityResult(Boolean result) {
+                        Log.i(ACTIVITY_TAG, "Capture Image");
+                        if (result) {
+                            Glide.with(CreateCampaignActivity.this).load(imageUri)
+                                    .into(crCamImageView);
+                            UpdateUIPickImage("image");
+                        }
+                    }
+                });
 
         // Get Current Date
         final Calendar c = Calendar.getInstance();
@@ -50,7 +92,7 @@ public class CreateCampaignActivity extends AppCompatActivity {
         crCamEdtOrganization = findViewById(R.id.crCam_edtOrganization);
         crCamEdtStartDate = findViewById(R.id.crCam_edtStartDate);
         crCamEdtDescription = findViewById(R.id.crCam_edtDescription);
-        crCamImage = findViewById(R.id.crCam_image);
+        crCamImageView = findViewById(R.id.crCam_image);
         crCamEdtCampaignName.setText(latitude.toString());
         crCamEdtOrganization.setText(longitude.toString());
 
@@ -90,5 +132,31 @@ public class CreateCampaignActivity extends AppCompatActivity {
             }
         });
 
+        crCamBtnChangeImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                captureImageLauncher.launch(imageUri);
+            }
+        });
+
+        crCamBtnRemoveImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                crCamImageView.setImageDrawable(getResources().getDrawable(R.drawable.app_logo));
+                UpdateUIPickImage("default");
+            }
+        });
+
+    }
+
+    private void UpdateUIPickImage(String tag) {
+        crCamImageView.setTag(tag);
+        if (crCamImageView.getTag().equals("default")) {
+            crCamBtnChangeImage.setVisibility(View.VISIBLE);
+            crCamBtnRemoveImage.setVisibility(View.GONE);
+        } else {
+            crCamBtnChangeImage.setVisibility(View.GONE);
+            crCamBtnRemoveImage.setVisibility(View.VISIBLE);
+        }
     }
 }
