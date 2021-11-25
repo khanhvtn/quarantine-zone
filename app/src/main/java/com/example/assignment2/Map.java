@@ -3,6 +3,10 @@ package com.example.assignment2;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.LinearLayoutCompat;
@@ -43,8 +47,28 @@ public class Map extends Fragment {
     private FragmentManager fm;
     private IMapManagement listener;
     private BottomNavigationView bottomNavigationView;
+    private ActivityResultLauncher userResultLauncher;
 
     public Map() {
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.i("Map", "OnCreate");
+        listener = (IMapManagement) getActivity();
+        userResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                new ActivityResultCallback<ActivityResult>() {
+                    @Override
+                    public void onActivityResult(ActivityResult result) {
+                        if (result.getData() != null) {
+                            User user = result.getData().getParcelableExtra("user");
+                            listener.setCurrentUser(user);
+                            UpdateUIUserLogin();
+                        }
+                    }
+                });
     }
 
     @Nullable
@@ -79,24 +103,13 @@ public class Map extends Fragment {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentTransaction ft =
-                        fm.beginTransaction().setCustomAnimations(
-                                R.anim.slide_in,  // enter
-                                R.anim.fade_out,  // exit
-                                R.anim.fade_in,   // popEnter
-                                R.anim.slide_out  // popExit
-                        );
-
-                ft.replace(R.id.frame_layout, new Login());
-                ft.commit();
+                userResultLauncher.launch(new Intent(getContext(), LoginActivity.class));
             }
         });
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                ft.replace(R.id.frame_layout, new Register());
-                ft.commit();
+                userResultLauncher.launch(new Intent(getContext(), RegisterActivity.class));
             }
         });
 
@@ -131,11 +144,6 @@ public class Map extends Fragment {
 
     }
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Log.i("Map", "OnCreate");
-    }
 
     @Override
     public void onStart() {

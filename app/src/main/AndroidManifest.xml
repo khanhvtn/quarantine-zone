@@ -16,6 +16,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Assignment2">
         <activity
+            android:name=".RegisterActivity"
+            android:exported="false" />
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false" />
+        <activity
             android:name=".CreateCampaignActivity"
             android:exported="false" />
         <!--

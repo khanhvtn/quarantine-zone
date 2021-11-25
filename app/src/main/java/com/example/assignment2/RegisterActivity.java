@@ -1,14 +1,11 @@
 package com.example.assignment2;
 
-import android.os.Bundle;
-
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
+import androidx.appcompat.app.AppCompatActivity;
 
-import android.view.LayoutInflater;
+import android.content.Intent;
+import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -19,8 +16,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-
-public class Register extends Fragment {
+public class RegisterActivity extends AppCompatActivity {
 
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
@@ -28,38 +24,30 @@ public class Register extends Fragment {
     private EditText edtFullName, edtEmail, edtPassword, edtPhone, edtAddress;
     private IMapManagement listener;
 
-
-    public Register() {
-        // Required empty public constructor
-    }
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        getSupportActionBar().hide();
+        setContentView(R.layout.activity_register);
 
-        // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_register, container, false);
         //declare field
-        edtFullName = v.findViewById(R.id.register_edtFullName);
-        edtEmail = v.findViewById(R.id.register_edtEmail);
-        edtPassword = v.findViewById(R.id.register_edtPassword);
-        edtPhone = v.findViewById(R.id.register_edtPhone);
-        edtAddress = v.findViewById(R.id.register_edtAddress);
-        btnBack = v.findViewById(R.id.register_btnBack);
-        btnRegister = v.findViewById(R.id.register_btnRegister);
+        edtFullName = findViewById(R.id.register_edtFullName);
+        edtEmail = findViewById(R.id.register_edtEmail);
+        edtPassword = findViewById(R.id.register_edtPassword);
+        edtPhone = findViewById(R.id.register_edtPhone);
+        edtAddress = findViewById(R.id.register_edtAddress);
+        btnBack = findViewById(R.id.register_btnBack);
+        btnRegister = findViewById(R.id.register_btnRegister);
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
-
-        //get activity
-        listener = (IMapManagement) getActivity();
 
 
         //Listener
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                closeRegister();
+                onBackPressed();
             }
         });
 
@@ -92,12 +80,12 @@ public class Register extends Fragment {
                                                     public void onComplete(
                                                             @NonNull Task<Void> task) {
                                                         if (task.isSuccessful()) {
-                                                            listener.setCurrentUser(newUser);
-                                                            listener.UpdateUIUserLogin();
                                                             Toast.makeText(v.getContext(),
                                                                     "Register Successful. Please Login!!!",
                                                                     Toast.LENGTH_SHORT).show();
-                                                            closeRegister();
+                                                            setResult(RESULT_OK, new Intent()
+                                                                    .putExtra("user", newUser));
+                                                            finish();
                                                         } else {
                                                             Toast.makeText(v.getContext(),
                                                                     task.getException()
@@ -116,7 +104,6 @@ public class Register extends Fragment {
                 }
             }
         });
-        return v;
     }
 
     public String validateUserInput(String fullName, String email, String password, String phone,
@@ -138,16 +125,5 @@ public class Register extends Fragment {
         }
 
         return null;
-    }
-
-    public void closeRegister() {
-        FragmentManager fragmentManager =
-                getParentFragmentManager();
-        fragmentManager.beginTransaction().setCustomAnimations(
-                R.anim.slide_in,  // enter
-                R.anim.fade_out,  // exit
-                R.anim.fade_in,   // popEnter
-                R.anim.slide_out  // popExit
-        ).replace(R.id.frame_layout, new Map()).commit();
     }
 }

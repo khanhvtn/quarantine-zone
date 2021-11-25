@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".RegisterActivity">
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/register_btnBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="20dp"
+        android:background="@android:color/transparent"
+        android:drawableStart="@drawable/ic_baseline_arrow_back_ios"
+        android:text="Back" />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginHorizontal="30dp"
+        android:orientation="vertical">
+
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/register_edtFullName"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/custom_input"
+            android:drawableStart="@drawable/ic_baseline_person_24"
+            android:drawablePadding="10dp"
+            android:ems="10"
+            android:hint="Full Name"
+            android:inputType="text"
+            android:paddingHorizontal="20dp" />
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/register_edtEmail"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/custom_input"
+            android:drawableStart="@drawable/custom_email_icon"
+            android:drawablePadding="10dp"
+            android:ems="10"
+            android:hint="Email"
+            android:inputType="text"
+            android:paddingHorizontal="20dp" />
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/register_edtPassword"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/custom_input"
+            android:drawableStart="@drawable/custom_lock_icon"
+            android:drawablePadding="10dp"
+            android:ems="10"
+            android:hint="Password"
+            android:inputType="textPassword"
+            android:paddingHorizontal="20dp" />
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/register_edtPhone"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/custom_input"
+            android:drawableStart="@drawable/ic_baseline_local_phone"
+            android:drawablePadding="10dp"
+            android:ems="10"
+            android:hint="Phone"
+            android:inputType="text"
+            android:paddingHorizontal="20dp" />
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/register_edtAddress"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/custom_input"
+            android:drawableStart="@drawable/ic_baseline_location_city"
+            android:drawablePadding="10dp"
+            android:ems="10"
+            android:hint="Address"
+            android:inputType="text"
+            android:paddingHorizontal="20dp" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/register_btnRegister"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@drawable/custom_button"
+            android:backgroundTint="@color/primary_color"
+            android:padding="10dp"
+            android:text="Register" />
+    </LinearLayout>
+
+</RelativeLayout>
