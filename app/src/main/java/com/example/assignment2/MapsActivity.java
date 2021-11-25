@@ -102,7 +102,7 @@ public class MapsActivity extends AppCompatActivity implements IMapManagement {
     }
 
     @Override
-    public void UpdateUIUserLogin() {
+    public void UpdateBottomNavigationBar() {
         if (currentUSer != null) {
             if (currentUSer.getAdmin() != null) {
                 bottomNavigationView.getMenu().findItem(R.id.nvb_report).setVisible(true);

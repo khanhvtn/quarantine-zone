@@ -59,7 +59,7 @@ public class UserProfile extends Fragment {
             public void onClick(View v) {
                 mAuth.signOut();
                 listener.setCurrentUser(null);
-                listener.UpdateUIUserLogin();
+                listener.UpdateBottomNavigationBar();
                 listener.switchFragmentInMainActivity(new Map());
             }
         });

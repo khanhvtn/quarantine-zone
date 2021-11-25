@@ -20,7 +20,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -29,7 +28,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -40,13 +38,11 @@ public class Map extends Fragment {
     private FirebaseFirestore db;
     private GoogleMap mMap;
     private Button btnLogin, btnRegister;
-    private ImageButton btnLogout;
     private LinearLayoutCompat wrapperBtn;
     private EditText edtSearch;
     private FirebaseAuth mAuth;
     private FragmentManager fm;
     private IMapManagement listener;
-    private BottomNavigationView bottomNavigationView;
     private ActivityResultLauncher userResultLauncher;
 
     public Map() {
@@ -56,6 +52,11 @@ public class Map extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.i("Map", "OnCreate");
+        //firebase
+        db = FirebaseFirestore.getInstance();
+
+        // Initialize Firebase Auth
+        mAuth = FirebaseAuth.getInstance();
         listener = (IMapManagement) getActivity();
         userResultLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -65,6 +66,7 @@ public class Map extends Fragment {
                         if (result.getData() != null) {
                             User user = result.getData().getParcelableExtra("user");
                             listener.setCurrentUser(user);
+                            listener.UpdateBottomNavigationBar();
                             UpdateUIUserLogin();
                         }
                     }
@@ -77,18 +79,13 @@ public class Map extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_map, container, false);
 
-        //firebase
-        db = FirebaseFirestore.getInstance();
 
-        // Initialize Firebase Auth
-        mAuth = FirebaseAuth.getInstance();
 
         //declare fields
         wrapperBtn = view.findViewById(R.id.map_wrapperBtn);
         edtSearch = view.findViewById(R.id.map_edtSearch);
         btnLogin = view.findViewById(R.id.map_btnLogin);
         btnRegister = view.findViewById(R.id.map_btnRegister);
-        bottomNavigationView = getActivity().findViewById(R.id.bottom_navigation);
 
         //config fragment
         fm = getParentFragmentManager();
@@ -150,6 +147,7 @@ public class Map extends Fragment {
         super.onStart();
         Log.i("Map", "OnStart");
         UpdateUIUserLogin();
+        listener.UpdateBottomNavigationBar();
     }
 
     @Override
@@ -189,7 +187,7 @@ public class Map extends Fragment {
                             public void onSuccess(DocumentSnapshot documentSnapshot) {
                                 User user = documentSnapshot.toObject(User.class);
                                 listener.setCurrentUser(user);
-                                listener.UpdateUIUserLogin();
+                                listener.UpdateBottomNavigationBar();
                             }
                         });
             } else {
