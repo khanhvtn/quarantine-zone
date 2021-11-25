@@ -100,13 +100,13 @@ public class Map extends Fragment {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                userResultLauncher.launch(new Intent(getContext(), LoginActivity.class));
+                userResultLauncher.launch(new Intent(getActivity(), LoginActivity.class));
             }
         });
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                userResultLauncher.launch(new Intent(getContext(), RegisterActivity.class));
+                userResultLauncher.launch(new Intent(getActivity(), RegisterActivity.class));
             }
         });
 
@@ -129,7 +129,7 @@ public class Map extends Fragment {
                 mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
                     @Override
                     public void onMapClick(LatLng latLng) {
-                        Intent intent = new Intent(getContext(), CreateCampaignActivity.class);
+                        Intent intent = new Intent(getActivity(), CreateCampaignActivity.class);
                         intent.putExtra("latitude", latLng.latitude);
                         intent.putExtra("longitude", latLng.longitude);
                         startActivity(intent);

@@ -24,7 +24,7 @@
         <entry key="app/src/main/res/drawable/logout_icon.xml" value="0.18385416666666668" />
         <entry key="app/src/main/res/drawable/nav_item_selected_state.xml" value="0.18072916666666666" />
         <entry key="app/src/main/res/drawable/rounded_corner.xml" value="0.321025641025641" />
-        <entry key="app/src/main/res/layout/activity_create_campaign.xml" value="0.125" />
+        <entry key="app/src/main/res/layout/activity_create_campaign.xml" value="0.22215384615384615" />
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.18177083333333333" />
         <entry key="app/src/main/res/layout/activity_maps.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_register.xml" value="0.1671875" />
