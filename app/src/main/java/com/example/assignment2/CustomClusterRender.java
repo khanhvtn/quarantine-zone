@@ -9,11 +9,12 @@ import androidx.annotation.NonNull;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 
-public class CustomClusterRender extends DefaultClusterRenderer {
+public class CustomClusterRender extends DefaultClusterRenderer<MarkerItem> {
     private final Context mContext;
 
     public CustomClusterRender(Context context,
@@ -21,10 +22,16 @@ public class CustomClusterRender extends DefaultClusterRenderer {
                                ClusterManager clusterManager) {
         super(context, map, clusterManager);
         mContext = context;
+        clusterManager.setRenderer(this);
     }
 
     @Override
-    protected void onBeforeClusterItemRendered(@NonNull ClusterItem item,
+    protected boolean shouldRenderAsCluster(@NonNull Cluster<MarkerItem> cluster) {
+        return cluster.getSize() >= 2;
+    }
+
+    @Override
+    protected void onBeforeClusterItemRendered(@NonNull MarkerItem item,
                                                @NonNull MarkerOptions markerOptions) {
         int height = 70;
         int width = 70;
@@ -35,4 +42,5 @@ public class CustomClusterRender extends DefaultClusterRenderer {
         markerOptions.icon(
                 BitmapDescriptorFactory.fromBitmap(smallMarker));
     }
+
 }

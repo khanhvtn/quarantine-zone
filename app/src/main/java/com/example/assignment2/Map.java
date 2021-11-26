@@ -130,8 +130,7 @@ public class Map extends Fragment {
                 // Initialize the manager with the context and the map.
                 // (Activity extends context, so we can pass 'this' in the constructor.)
                 clusterManager = new ClusterManager<MarkerItem>(getContext(), mMap);
-                CustomClusterRender renderer = new CustomClusterRender(getContext(), mMap, clusterManager);
-                clusterManager.setRenderer(renderer);
+                new CustomClusterRender(getContext(), mMap, clusterManager);
 
                 // Point the map's listeners at the listeners implemented by the cluster
                 // manager.
@@ -140,18 +139,8 @@ public class Map extends Fragment {
 
                 // Move camera to RMIT Vietnam Location
                 // Position the map.
-
-                LatLng rmit = new LatLng(10.729567, 106.6930756);
-                int height = 70;
-                int width = 70;
-                BitmapDrawable bitmapdraw =
-                        (BitmapDrawable) getResources().getDrawable(R.drawable.icon_marker);
-                Bitmap b = bitmapdraw.getBitmap();
-                Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
-                mMap.addMarker(
-                        new MarkerOptions().position(rmit).title("Marker in RMIT Vietnam").icon(
-                                BitmapDescriptorFactory.fromBitmap(smallMarker)));
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(rmit, 15));
+                LatLng rmitLocation = new LatLng(10.729567, 106.6930756);
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(rmitLocation, 15));
                 mMap.getUiSettings().setZoomControlsEnabled(true);
                 mMap.getUiSettings().setMyLocationButtonEnabled(true);
 
@@ -166,7 +155,6 @@ public class Map extends Fragment {
                         startActivity(intent);
                     }
                 });
-                //add marker campain
                 //get all campaigns
                 db.collection("campaigns").get().addOnCompleteListener(
                         new OnCompleteListener<QuerySnapshot>() {
@@ -175,13 +163,13 @@ public class Map extends Fragment {
                                 if (task.isSuccessful()) {
                                     for (QueryDocumentSnapshot document : task.getResult()) {
                                         Campaign campaign = document.toObject(Campaign.class);
-
                                         MarkerItem markerItem = new MarkerItem(
                                                 campaign.getLatitude(), campaign.getLongitude(),
                                                 campaign.getCampaignName(),
                                                 campaign.getDescription());
                                         clusterManager.addItem(markerItem);
                                     }
+                                    clusterManager.cluster();
                                 } else {
                                     Log.d("GetAllCampaigns", "Error getting documents: ",
                                             task.getException());
@@ -250,22 +238,6 @@ public class Map extends Fragment {
                 wrapperBtn.setVisibility(View.VISIBLE);
             }
 
-        }
-    }
-
-    private void addItems() {
-
-        // Set some lat/lng coordinates to start with.
-        double lat = 51.5145160;
-        double lng = -0.1270060;
-
-        // Add ten cluster items in close proximity, for purposes of this example.
-        for (int i = 0; i < 10; i++) {
-            double offset = i / 60d;
-            lat = lat + offset;
-            lng = lng + offset;
-            MarkerItem offsetItem = new MarkerItem(lat, lng, "Title " + i, "Snippet " + i);
-            clusterManager.addItem(offsetItem);
         }
     }
 }
