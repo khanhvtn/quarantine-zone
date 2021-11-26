@@ -85,7 +85,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="40dp"
                         android:layout_below="@+id/crCam_image"
-                        android:layout_marginLeft="20dp"
                         android:background="@drawable/custom_button"
                         android:backgroundTint="@color/secondary_color"
                         android:drawableStart="@drawable/ic_remove_photo"

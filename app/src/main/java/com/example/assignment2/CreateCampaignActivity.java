@@ -30,8 +30,10 @@ import java.io.File;
 import java.net.URI;
 import java.util.Calendar;
 
-public class CreateCampaignActivity extends AppCompatActivity {
+public class CreateCampaignActivity extends AppCompatActivity
+        implements CaptureImageDialogFragment.NoticeDialogListener {
     private static final String ACTIVITY_TAG = "CreateCampaign";
+    private static final String CAPTURE_IMAGE_DIALOG_TAG = "CAPTURE_IMAGE_DIALOG_TAG";
     private static final int REQUEST_ID_READ_WRITE_PERMISSION = 99;
     private static final int REQUEST_ID_IMAGE_CAPTURE = 100;
     private static final int REQUEST_ID_VIDEO_CAPTURE = 101;
@@ -41,8 +43,9 @@ public class CreateCampaignActivity extends AppCompatActivity {
             crCamEdtDescription;
     private AppCompatImageView crCamImageView;
     private int lastSelectedYear, lastSelectedMonth, lastSelectedDayOfMonth;
-    private ActivityResultLauncher<Uri> captureImageLauncher;
+    private ActivityResultLauncher captureImageLauncher, pickImageFromPhoto;
     private Uri imageUri;
+    private CaptureImageDialogFragment captureImageDialogFragment;
 
 
     @Override
@@ -64,6 +67,17 @@ public class CreateCampaignActivity extends AppCompatActivity {
                         Log.i(ACTIVITY_TAG, "Capture Image");
                         if (result) {
                             Glide.with(CreateCampaignActivity.this).load(imageUri)
+                                    .into(crCamImageView);
+                            UpdateUIPickImage("image");
+                        }
+                    }
+                });
+        pickImageFromPhoto = registerForActivityResult(new ActivityResultContracts.GetContent(),
+                new ActivityResultCallback<Uri>() {
+                    @Override
+                    public void onActivityResult(Uri result) {
+                        if (result != null) {
+                            Glide.with(CreateCampaignActivity.this).load(result)
                                     .into(crCamImageView);
                             UpdateUIPickImage("image");
                         }
@@ -105,7 +119,7 @@ public class CreateCampaignActivity extends AppCompatActivity {
         crCamBtnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onBackPressed();
+                finish();
             }
         });
 
@@ -135,7 +149,11 @@ public class CreateCampaignActivity extends AppCompatActivity {
         crCamBtnChangeImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                captureImageLauncher.launch(imageUri);
+                captureImageDialogFragment = new CaptureImageDialogFragment();
+                captureImageDialogFragment
+                        .show(getSupportFragmentManager(), CAPTURE_IMAGE_DIALOG_TAG);
+//                captureImageLauncher.launch(imageUri);
+
             }
         });
 
@@ -157,6 +175,18 @@ public class CreateCampaignActivity extends AppCompatActivity {
         } else {
             crCamBtnChangeImage.setVisibility(View.GONE);
             crCamBtnRemoveImage.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
+    public void onPickingOption(int optionIndex) {
+        switch (optionIndex) {
+            case 0:
+                captureImageLauncher.launch(imageUri);
+                break;
+            case 1:
+                pickImageFromPhoto.launch("image/*");
+                break;
         }
     }
 }
