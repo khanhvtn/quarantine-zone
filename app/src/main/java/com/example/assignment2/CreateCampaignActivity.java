@@ -6,6 +6,7 @@ import androidx.activity.result.contract.ActivityResultContract;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatEditText;
@@ -23,8 +24,19 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
 import java.net.URI;
@@ -46,6 +58,10 @@ public class CreateCampaignActivity extends AppCompatActivity
     private ActivityResultLauncher captureImageLauncher, pickImageFromPhoto;
     private Uri imageUri;
     private CaptureImageDialogFragment captureImageDialogFragment;
+    private AlertDialog loadingProgress;
+    private String campaignName, organization, startDate, description;
+    private FirebaseFirestore db;
+    private FirebaseStorage storage;
 
 
     @Override
@@ -53,6 +69,14 @@ public class CreateCampaignActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         getSupportActionBar().hide();
         setContentView(R.layout.activity_create_campaign);
+        //Firebase
+        db = FirebaseFirestore.getInstance();
+        storage = FirebaseStorage.getInstance();
+
+        //generate progress dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(R.layout.loading_progress).setCancelable(false);
+        loadingProgress = builder.create();
 
         //create temporary image
         File newFile = new File(this.getFilesDir(), "default_image.jpg");
@@ -77,8 +101,10 @@ public class CreateCampaignActivity extends AppCompatActivity
                     @Override
                     public void onActivityResult(Uri result) {
                         if (result != null) {
+
                             Glide.with(CreateCampaignActivity.this).load(result)
                                     .into(crCamImageView);
+                            imageUri = result;
                             UpdateUIPickImage("image");
                         }
                     }
@@ -107,8 +133,6 @@ public class CreateCampaignActivity extends AppCompatActivity
         crCamEdtStartDate = findViewById(R.id.crCam_edtStartDate);
         crCamEdtDescription = findViewById(R.id.crCam_edtDescription);
         crCamImageView = findViewById(R.id.crCam_image);
-        crCamEdtCampaignName.setText(latitude.toString());
-        crCamEdtOrganization.setText(longitude.toString());
 
         //set current for start date field.
         crCamEdtStartDate
@@ -152,7 +176,6 @@ public class CreateCampaignActivity extends AppCompatActivity
                 captureImageDialogFragment = new CaptureImageDialogFragment();
                 captureImageDialogFragment
                         .show(getSupportFragmentManager(), CAPTURE_IMAGE_DIALOG_TAG);
-//                captureImageLauncher.launch(imageUri);
 
             }
         });
@@ -162,6 +185,91 @@ public class CreateCampaignActivity extends AppCompatActivity
             public void onClick(View v) {
                 crCamImageView.setImageDrawable(getResources().getDrawable(R.drawable.app_logo));
                 UpdateUIPickImage("default");
+            }
+        });
+
+        crCamBtnCreate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadingProgress.show();
+                String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                String validateResult = validateUserInput();
+                if (validateResult != null) {
+                    Toast.makeText(CreateCampaignActivity.this, validateResult, Toast.LENGTH_SHORT)
+                            .show();
+                    loadingProgress.dismiss();
+                } else {
+                    Campaign newCampaign = new Campaign(longitude, latitude, campaignName,
+                            organization, startDate, description,
+                            currentUserId);
+                    db.collection("campaigns").add(newCampaign).addOnSuccessListener(
+                            new OnSuccessListener<DocumentReference>() {
+                                @Override
+                                public void onSuccess(DocumentReference documentReference) {
+                                    String imageFileName = documentReference.getId() + ".jpg";
+                                    UploadTask uploadTask =
+                                            storage.getReference().child("images/" + imageFileName)
+                                                    .putFile(imageUri);
+                                    uploadTask.addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            db.collection("events")
+                                                    .document(documentReference.getId()).delete();
+                                            Toast.makeText(CreateCampaignActivity.this,
+                                                    "Something went wrong with uploading image. Please try again!!!",
+                                                    Toast.LENGTH_SHORT)
+                                                    .show();
+                                            loadingProgress.dismiss();
+                                        }
+                                    });
+                                    uploadTask.addOnSuccessListener(
+                                            new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                                @Override
+                                                public void onSuccess(
+                                                        UploadTask.TaskSnapshot taskSnapshot) {
+                                                    newCampaign.setImageFileName(imageFileName);
+                                                    documentReference
+                                                            .set(newCampaign, SetOptions.merge())
+                                                            .addOnSuccessListener(
+                                                                    new OnSuccessListener<Void>() {
+                                                                        @Override
+                                                                        public void onSuccess(
+                                                                                Void unused) {
+                                                                            Toast.makeText(
+                                                                                    CreateCampaignActivity.this,
+                                                                                    "Create Successfully!!!",
+                                                                                    Toast.LENGTH_SHORT)
+                                                                                    .show();
+                                                                            loadingProgress
+                                                                                    .dismiss();
+                                                                            finish();
+                                                                        }
+                                                                    }).addOnFailureListener(
+                                                            new OnFailureListener() {
+                                                                @Override
+                                                                public void onFailure(
+                                                                        @NonNull Exception e) {
+                                                                    Toast.makeText(
+                                                                            CreateCampaignActivity.this,
+                                                                            "Something went wrong. Please try again!!!",
+                                                                            Toast.LENGTH_SHORT)
+                                                                            .show();
+                                                                    loadingProgress.dismiss();
+                                                                }
+                                                            });
+                                                }
+                                            });
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(CreateCampaignActivity.this, "Something went wrong!!!",
+                                    Toast.LENGTH_SHORT)
+                                    .show();
+                            loadingProgress.dismiss();
+                        }
+                    });
+                }
             }
         });
 
@@ -187,6 +295,26 @@ public class CreateCampaignActivity extends AppCompatActivity
             case 1:
                 pickImageFromPhoto.launch("image/*");
                 break;
+        }
+    }
+
+    private String validateUserInput() {
+        campaignName = crCamEdtCampaignName.getText().toString().trim();
+        organization = crCamEdtOrganization.getText().toString().trim();
+        startDate = crCamEdtStartDate.getText().toString().trim();
+        description = crCamEdtDescription.getText().toString().trim();
+        if (campaignName.isEmpty()) {
+            return "Campaign Name can not be blanked.";
+        } else if (organization.isEmpty()) {
+            return "Organization can not be blanked.";
+        } else if (startDate.isEmpty()) {
+            return "Start Date can not be blanked.";
+        } else if (description.isEmpty()) {
+            return "Description can not be blanked.";
+        }else if (crCamImageView.getTag().equals("default")) {
+            return "Please upload image.";
+        } else {
+            return null;
         }
     }
 }

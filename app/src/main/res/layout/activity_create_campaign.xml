@@ -72,8 +72,7 @@
                     <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/crCam_btnChangeImage"
                         android:layout_width="wrap_content"
-                        android:layout_height="40dp"
-
+                        android:layout_height="48dp"
                         android:background="@drawable/custom_button"
                         android:drawableStart="@drawable/ic_add_photo"
                         android:drawablePadding="10dp"
@@ -83,7 +82,7 @@
                     <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/crCam_btnRemoveImage"
                         android:layout_width="wrap_content"
-                        android:layout_height="40dp"
+                        android:layout_height="48dp"
                         android:layout_below="@+id/crCam_image"
                         android:background="@drawable/custom_button"
                         android:backgroundTint="@color/secondary_color"

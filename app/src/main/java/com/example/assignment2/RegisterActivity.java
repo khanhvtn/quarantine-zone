@@ -1,6 +1,7 @@
 package com.example.assignment2;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -23,12 +24,18 @@ public class RegisterActivity extends AppCompatActivity {
     private Button btnRegister, btnBack;
     private EditText edtFullName, edtEmail, edtPassword, edtPhone, edtAddress;
     private IMapManagement listener;
+    private AlertDialog loadingProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().hide();
         setContentView(R.layout.activity_register);
+
+        //generate progress dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(R.layout.loading_progress).setCancelable(false);
+        loadingProgress = builder.create();
 
         //declare field
         edtFullName = findViewById(R.id.register_edtFullName);
@@ -54,6 +61,7 @@ public class RegisterActivity extends AppCompatActivity {
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                loadingProgress.show();
                 String fullName = edtFullName.getText().toString().trim();
                 String email = edtEmail.getText().toString().trim();
                 String password = edtPassword.getText().toString().trim();
@@ -63,15 +71,16 @@ public class RegisterActivity extends AppCompatActivity {
                         validateUserInput(fullName, email, password, phone, address);
                 if (validateResult != null) {
                     Toast.makeText(v.getContext(), validateResult, Toast.LENGTH_SHORT).show();
+                    loadingProgress.dismiss();
                 } else {
                     mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(
                             new OnCompleteListener<AuthResult>() {
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
-                                    String userId = task.getResult().getUser().getUid();
                                     User newUser = new User(fullName, email, phone, address);
-                                    newUser.setUserId(userId);
                                     if (task.isSuccessful()) {
+                                        String userId = task.getResult().getUser().getUid();
+                                        newUser.setUserId(userId);
                                         db.collection("users")
                                                 .document(userId)
                                                 .set(newUser).addOnCompleteListener(
@@ -85,12 +94,14 @@ public class RegisterActivity extends AppCompatActivity {
                                                                     Toast.LENGTH_SHORT).show();
                                                             setResult(RESULT_OK, new Intent()
                                                                     .putExtra("user", newUser));
+                                                            loadingProgress.dismiss();
                                                             finish();
                                                         } else {
                                                             Toast.makeText(v.getContext(),
                                                                     task.getException()
                                                                             .getMessage(),
                                                                     Toast.LENGTH_SHORT).show();
+                                                            loadingProgress.dismiss();
                                                         }
                                                     }
                                                 });
@@ -98,6 +109,7 @@ public class RegisterActivity extends AppCompatActivity {
                                         Toast.makeText(v.getContext(),
                                                 task.getException().getMessage(),
                                                 Toast.LENGTH_SHORT).show();
+                                        loadingProgress.dismiss();
                                     }
                                 }
                             });
