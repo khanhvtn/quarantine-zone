@@ -44,5 +44,4 @@ public class CustomClusterRender extends DefaultClusterRenderer<MarkerItem> {
                 .snippet(item.getSnippet());
     }
 
-
 }

@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.activity.result.ActivityResult;
@@ -13,6 +14,8 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.AppCompatImageView;
+import androidx.appcompat.widget.AppCompatTextView;
 import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -24,7 +27,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -32,8 +37,10 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -42,7 +49,10 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
 import com.google.maps.android.clustering.ClusterManager;
+
+import java.util.List;
 
 public class Map extends Fragment {
 
@@ -52,20 +62,31 @@ public class Map extends Fragment {
     private LinearLayoutCompat wrapperBtn;
     private EditText edtSearch;
     private FirebaseAuth mAuth;
+    private FirebaseStorage firebaseStorage;
     private FragmentManager fm;
     private IMapManagement listener;
     private ActivityResultLauncher userResultLauncher;
     private ClusterManager<MarkerItem> clusterManager;
+    private AlertDialog loadingProgress;
+
 
     public Map() {
     }
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        Log.i("Map", "OnCreate");
+
+        //generate progress dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setView(R.layout.loading_progress).setCancelable(false);
+        loadingProgress = builder.create();
+
         //firebase
         db = FirebaseFirestore.getInstance();
+        firebaseStorage = FirebaseStorage.getInstance();
 
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
@@ -144,8 +165,7 @@ public class Map extends Fragment {
                 LatLng rmitLocation = new LatLng(10.729567, 106.6930756);
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(rmitLocation, 15));
                 mMap.getUiSettings().setZoomControlsEnabled(true);
-//                mMap.getUiSettings().setMyLocationButtonEnabled(true);
-
+                mMap.getUiSettings().setMyLocationButtonEnabled(true);
 
                 //set onClick Map
                 mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
@@ -176,6 +196,104 @@ public class Map extends Fragment {
                         }
                     }
                 });
+                //on Marker Click
+                clusterManager.setOnClusterItemClickListener(
+                        new ClusterManager.OnClusterItemClickListener<MarkerItem>() {
+                            @Override
+                            public boolean onClusterItemClick(MarkerItem marker) {
+                                loadingProgress.show();
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                                View view = getLayoutInflater()
+                                        .inflate(R.layout.custom_info_window, null);
+                                AppCompatImageView imageView =
+                                        view.findViewById(R.id.win_imageView);
+                                AppCompatTextView txtCampaignName =
+                                        view.findViewById(R.id.win_txtCampaignName);
+                                AppCompatTextView txtStartDate =
+                                        view.findViewById(R.id.win_txtStartDate);
+                                AppCompatTextView txtNumVolunteer =
+                                        view.findViewById(R.id.win_txtNumVolunteer);
+                                builder.setView(view);
+                                db.collection("campaigns")
+                                        .whereEqualTo("campaignName", marker.getTitle()).get()
+                                        .addOnSuccessListener(
+                                                new OnSuccessListener<QuerySnapshot>() {
+                                                    @Override
+                                                    public void onSuccess(
+                                                            QuerySnapshot queryDocumentSnapshots) {
+                                                        List<Campaign> campaignList =
+                                                                queryDocumentSnapshots
+                                                                        .toObjects(Campaign.class);
+                                                        Campaign targetCampaign =
+                                                                campaignList.get(0);
+                                                        firebaseStorage.getReference()
+                                                                .child("images/" + targetCampaign
+                                                                        .getImageFileName())
+                                                                .getDownloadUrl()
+                                                                .addOnSuccessListener(
+                                                                        new OnSuccessListener<Uri>() {
+                                                                            @Override
+                                                                            public void onSuccess(
+                                                                                    Uri uri) {
+                                                                                Glide.with(
+                                                                                        getContext())
+                                                                                        .load(uri)
+                                                                                        .into(imageView);
+                                                                                txtCampaignName
+                                                                                        .setText(
+                                                                                                targetCampaign
+                                                                                                        .getCampaignName());
+                                                                                txtStartDate
+                                                                                        .setText(
+                                                                                                targetCampaign
+                                                                                                        .getStartDate());
+                                                                                txtNumVolunteer
+                                                                                        .setText(
+                                                                                                "100");
+                                                                                loadingProgress
+                                                                                        .dismiss();
+                                                                                builder.show();
+                                                                            }
+                                                                        }).addOnFailureListener(
+                                                                new OnFailureListener() {
+                                                                    @Override
+                                                                    public void onFailure(
+                                                                            @NonNull Exception e) {
+                                                                        Log.e(getContext()
+                                                                                        .getClass()
+                                                                                        .toString(),
+                                                                                e.getMessage());
+                                                                        loadingProgress.dismiss();
+                                                                    }
+                                                                });
+                                                    }
+                                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Log.e(getContext().getClass().toString(), e.getMessage());
+                                        loadingProgress.dismiss();
+                                    }
+                                });
+
+                                builder.setNegativeButton("Close",
+                                        new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                dialog.dismiss();
+                                            }
+                                        }).setPositiveButton("Detail",
+                                        new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                Toast.makeText(getContext(),
+                                                        "Go To Campaign Detail", Toast.LENGTH_SHORT)
+                                                        .show();
+                                            }
+                                        });
+
+                                return true;
+                            }
+                        });
                 //get all campaigns
                 db.collection("campaigns").get().addOnCompleteListener(
                         new OnCompleteListener<QuerySnapshot>() {
@@ -184,6 +302,7 @@ public class Map extends Fragment {
                                 if (task.isSuccessful()) {
                                     for (QueryDocumentSnapshot document : task.getResult()) {
                                         Campaign campaign = document.toObject(Campaign.class);
+
                                         MarkerItem markerItem = new MarkerItem(
                                                 campaign.getLatitude(), campaign.getLongitude(),
                                                 campaign.getCampaignName(),

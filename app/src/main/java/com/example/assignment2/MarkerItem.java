@@ -1,5 +1,7 @@
 package com.example.assignment2;
 
+import android.net.Uri;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -16,6 +18,7 @@ public class MarkerItem implements ClusterItem {
         this.title = title;
         this.snippet = snippet;
     }
+
 
     @Override
     public LatLng getPosition() {
