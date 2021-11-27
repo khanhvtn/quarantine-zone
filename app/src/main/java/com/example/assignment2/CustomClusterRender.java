@@ -40,7 +40,9 @@ public class CustomClusterRender extends DefaultClusterRenderer<MarkerItem> {
         Bitmap b = bitmapdraw.getBitmap();
         Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
         markerOptions.icon(
-                BitmapDescriptorFactory.fromBitmap(smallMarker));
+                BitmapDescriptorFactory.fromBitmap(smallMarker)).title(item.getTitle())
+                .snippet(item.getSnippet());
     }
+
 
 }

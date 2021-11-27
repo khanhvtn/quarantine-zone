@@ -1,5 +1,6 @@
 package com.example.assignment2;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -11,6 +12,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -61,7 +63,7 @@ public class Map extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i("Map", "OnCreate");
+//        Log.i("Map", "OnCreate");
         //firebase
         db = FirebaseFirestore.getInstance();
 
@@ -142,17 +144,36 @@ public class Map extends Fragment {
                 LatLng rmitLocation = new LatLng(10.729567, 106.6930756);
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(rmitLocation, 15));
                 mMap.getUiSettings().setZoomControlsEnabled(true);
-                mMap.getUiSettings().setMyLocationButtonEnabled(true);
+//                mMap.getUiSettings().setMyLocationButtonEnabled(true);
 
 
                 //set onClick Map
                 mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
                     @Override
                     public void onMapClick(LatLng latLng) {
-                        Intent intent = new Intent(getActivity(), CreateCampaignActivity.class);
-                        intent.putExtra("latitude", latLng.latitude);
-                        intent.putExtra("longitude", latLng.longitude);
-                        startActivity(intent);
+                        if (listener.getCurrentUser() != null) {
+                            Intent intent = new Intent(getActivity(), CreateCampaignActivity.class);
+                            intent.putExtra("latitude", latLng.latitude);
+                            intent.putExtra("longitude", latLng.longitude);
+                            startActivity(intent);
+                        } else {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                            builder.setMessage("Please login to create a campaign.")
+                                    .setCancelable(false).setPositiveButton(
+                                    "Login", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            userResultLauncher.launch(new Intent(getActivity(),
+                                                    LoginActivity.class));
+                                        }
+                                    }).setNegativeButton("Cancel",
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                        }
+                                    }).show();
+                        }
                     }
                 });
                 //get all campaigns
@@ -188,7 +209,7 @@ public class Map extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        Log.i("Map", "OnStart");
+//        Log.i("Map", "OnStart");
         UpdateUIUserLogin();
         listener.UpdateBottomNavigationBar();
     }
@@ -197,19 +218,19 @@ public class Map extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.i("Map", "OnDestroy");
+//        Log.i("Map", "OnDestroy");
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        Log.i("Map", "OnStop");
+//        Log.i("Map", "OnStop");
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        Log.i("Map", "OnPause");
+//        Log.i("Map", "OnPause");
     }
 
     @Override

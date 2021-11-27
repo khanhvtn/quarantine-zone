@@ -3,6 +3,7 @@ package com.example.assignment2;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatEditText;
 import androidx.fragment.app.Fragment;
@@ -27,6 +28,7 @@ public class UserProfile extends Fragment {
     private FirebaseFirestore db;
     private IMapManagement listener;
     private String mode = "view";
+    private AlertDialog loadingProgress;
 
 
     public UserProfile() {
@@ -37,6 +39,11 @@ public class UserProfile extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        //generate progress dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setView(R.layout.loading_progress).setCancelable(false);
+        loadingProgress = builder.create();
+
         //firebase
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
@@ -71,6 +78,7 @@ public class UserProfile extends Fragment {
                     toggleEditMode();
                 } else {
                     if (isUserChangeInfo()) {
+                        loadingProgress.show();
                         User updatedUserInfo = listener.getCurrentUser();
                         updatedUserInfo.setFullName(edtFullName.getText().toString().trim());
                         updatedUserInfo.setPhone(edtPhone.getText().toString().trim());
@@ -84,6 +92,7 @@ public class UserProfile extends Fragment {
                                                 Toast.LENGTH_SHORT).show();
                                         updateEdtText(updatedUserInfo);
                                         toggleEditMode();
+                                        loadingProgress.dismiss();
                                     }
                                 }).addOnFailureListener(new OnFailureListener() {
                             @Override
@@ -92,6 +101,7 @@ public class UserProfile extends Fragment {
                                         "Something went wrong. Please try again!!!",
                                         Toast.LENGTH_SHORT).show();
                                 toggleEditMode();
+                                loadingProgress.dismiss();
                             }
                         });
                     } else {
