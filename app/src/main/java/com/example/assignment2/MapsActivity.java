@@ -30,7 +30,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 
 public class MapsActivity extends AppCompatActivity implements IMapManagement {
-
+    private final String MAP_ACTIVITY_TAG = "MapsActivity";
     private FirebaseAuth mAuth;
     private BottomNavigationView bottomNavigationView;
     private User currentUSer = null;
@@ -40,6 +40,7 @@ public class MapsActivity extends AppCompatActivity implements IMapManagement {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.i(MAP_ACTIVITY_TAG, "onCreate");
         super.onCreate(savedInstanceState);
         getSupportActionBar().hide();
 
@@ -85,7 +86,7 @@ public class MapsActivity extends AppCompatActivity implements IMapManagement {
 
     @Override
     protected void onStart() {
-        Log.i("onStart", "onStart");
+        Log.i(MAP_ACTIVITY_TAG, "onStart");
         super.onStart();
 
     }
@@ -94,25 +95,25 @@ public class MapsActivity extends AppCompatActivity implements IMapManagement {
     @Override
     protected void onResume() {
         super.onResume();
-        Log.i("onResume", "onResume");
+        Log.i(MAP_ACTIVITY_TAG, "onResume");
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        Log.i("onPause", "onPause");
+        Log.i(MAP_ACTIVITY_TAG, "onPause");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        Log.i("onStop", "onStop");
+        Log.i(MAP_ACTIVITY_TAG, "onStop");
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.i("onDestroy", "onDestroy");
+        Log.i(MAP_ACTIVITY_TAG, "onDestroy");
     }
 
     @Override

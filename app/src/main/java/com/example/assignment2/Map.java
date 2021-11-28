@@ -1,5 +1,6 @@
 package com.example.assignment2;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -78,7 +79,7 @@ public class Map extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        Log.i("Map", "OnCreate");
+        Log.i("Map", "OnCreate");
 
         //generate progress dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -92,6 +93,8 @@ public class Map extends Fragment {
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
         listener = (IMapManagement) getActivity();
+
+        //register launcher
         userResultLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 new ActivityResultCallback<ActivityResult>() {
@@ -111,6 +114,7 @@ public class Map extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        Log.i("Map", "OnCreateView");
         View view = inflater.inflate(R.layout.fragment_map, container, false);
 
 
@@ -230,9 +234,11 @@ public class Map extends Fragment {
                                 btnDetail.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        Toast.makeText(getContext(), "Go To detail",
-                                                Toast.LENGTH_SHORT).show();
                                         infoDialog.dismiss();
+                                        Intent intent = new Intent(getContext(),
+                                                CampaignDetailActivity.class);
+                                        intent.putExtra("campaignName", marker.getTitle());
+                                        startActivity(intent);
                                     }
                                 });
                                 db.collection("campaigns")
@@ -323,8 +329,6 @@ public class Map extends Fragment {
                         });
             }
         });
-
-
         return view;
 
     }
@@ -333,28 +337,60 @@ public class Map extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-//        Log.i("Map", "OnStart");
+        Log.i("Map", "OnStart");
         UpdateUIUserLogin();
         listener.UpdateBottomNavigationBar();
+        if (mMap != null) {
+            //update campaign marker
+            mMap.clear();
+            clusterManager.clearItems();
+            clusterManager.cluster();
+            //get all campaigns
+            db.collection("campaigns").get().addOnCompleteListener(
+                    new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful()) {
+                                for (QueryDocumentSnapshot document : task
+                                        .getResult()) {
+                                    Campaign campaign =
+                                            document.toObject(Campaign.class);
+
+                                    MarkerItem markerItem = new MarkerItem(
+                                            campaign.getLatitude(),
+                                            campaign.getLongitude(),
+                                            campaign.getCampaignName(),
+                                            campaign.getDescription());
+                                    clusterManager.addItem(markerItem);
+                                }
+                                clusterManager.cluster();
+                            } else {
+                                Log.d("GetAllCampaigns",
+                                        "Error getting documents: ",
+                                        task.getException());
+                            }
+                        }
+                    });
+        }
     }
 
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-//        Log.i("Map", "OnDestroy");
+        Log.i("Map", "OnDestroy");
     }
 
     @Override
     public void onStop() {
         super.onStop();
-//        Log.i("Map", "OnStop");
+        Log.i("Map", "OnStop");
     }
 
     @Override
     public void onPause() {
         super.onPause();
-//        Log.i("Map", "OnPause");
+        Log.i("Map", "OnPause");
     }
 
     @Override

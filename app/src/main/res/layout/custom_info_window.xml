@@ -6,7 +6,6 @@
     android:layout_height="wrap_content"
     android:background="@drawable/rounded_corner"
     >
-
     <ImageView
         android:id="@+id/win_imageView"
         android:layout_width="150dp"

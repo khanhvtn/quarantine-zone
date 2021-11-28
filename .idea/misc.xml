@@ -7,7 +7,10 @@
         <entry key="app/src/main/res/drawable-anydpi/ic_add_photo.xml" value="0.14791666666666667" />
         <entry key="app/src/main/res/drawable-anydpi/ic_logout.xml" value="0.1361111111111111" />
         <entry key="app/src/main/res/drawable-anydpi/ic_minus.xml" value="0.321025641025641" />
+        <entry key="app/src/main/res/drawable-anydpi/ic_one_person.xml" value="0.23697916666666666" />
+        <entry key="app/src/main/res/drawable-anydpi/ic_organization.xml" value="0.23697916666666666" />
         <entry key="app/src/main/res/drawable-anydpi/ic_remove_photo.xml" value="0.12291666666666666" />
+        <entry key="app/src/main/res/drawable-anydpi/ic_tested_people.xml" value="0.23697916666666666" />
         <entry key="app/src/main/res/drawable/custom_button.xml" value="0.29814814814814816" />
         <entry key="app/src/main/res/drawable/custom_email_icon.xml" value="0.30833333333333335" />
         <entry key="app/src/main/res/drawable/custom_input.xml" value="0.321025641025641" />
@@ -20,11 +23,14 @@
         <entry key="app/src/main/res/drawable/ic_baseline_email_focused.xml" value="0.30833333333333335" />
         <entry key="app/src/main/res/drawable/ic_baseline_lock.xml" value="0.14629629629629629" />
         <entry key="app/src/main/res/drawable/ic_baseline_lock_focused.xml" value="0.30833333333333335" />
+        <entry key="app/src/main/res/drawable/ic_baseline_people_volunteer.xml" value="0.23697916666666666" />
         <entry key="app/src/main/res/drawable/ic_baseline_search.xml" value="0.29814814814814816" />
+        <entry key="app/src/main/res/drawable/ic_date_time.xml" value="0.23697916666666666" />
         <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.20052083333333334" />
         <entry key="app/src/main/res/drawable/logout_icon.xml" value="0.18385416666666668" />
         <entry key="app/src/main/res/drawable/nav_item_selected_state.xml" value="0.18072916666666666" />
         <entry key="app/src/main/res/drawable/rounded_corner.xml" value="0.321025641025641" />
+        <entry key="app/src/main/res/layout/activity_campaign_detail.xml" value="0.335" />
         <entry key="app/src/main/res/layout/activity_create_campaign.xml" value="0.22215384615384615" />
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.18177083333333333" />
         <entry key="app/src/main/res/layout/activity_maps.xml" value="0.25" />

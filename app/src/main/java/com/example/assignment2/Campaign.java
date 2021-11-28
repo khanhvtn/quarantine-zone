@@ -3,9 +3,13 @@ package com.example.assignment2;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
 public class Campaign implements Parcelable {
     private Double longitude, latitude;
     private String campaignName, organization, startDate, description, creatorId, imageFileName;
+    private ArrayList<String> listVolunteers = new ArrayList<>();
 
     public Campaign() {
     }
@@ -142,5 +146,13 @@ public class Campaign implements Parcelable {
 
     public void setCreatorId(String creatorId) {
         this.creatorId = creatorId;
+    }
+
+    public ArrayList<String> getListVolunteers() {
+        return listVolunteers;
+    }
+
+    public void setListVolunteers(ArrayList<String> listVolunteers) {
+        this.listVolunteers = listVolunteers;
     }
 }
