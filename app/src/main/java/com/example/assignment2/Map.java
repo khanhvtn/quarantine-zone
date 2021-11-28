@@ -14,6 +14,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.appcompat.widget.LinearLayoutCompat;
@@ -213,7 +214,27 @@ public class Map extends Fragment {
                                         view.findViewById(R.id.win_txtStartDate);
                                 AppCompatTextView txtNumVolunteer =
                                         view.findViewById(R.id.win_txtNumVolunteer);
+                                AppCompatButton btnCancel =
+                                        view.findViewById(R.id.win_btnCancel);
+                                AppCompatButton btnDetail =
+                                        view.findViewById(R.id.win_btnDetail);
                                 builder.setView(view);
+                                AlertDialog infoDialog = builder.create();
+
+                                btnCancel.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        infoDialog.dismiss();
+                                    }
+                                });
+                                btnDetail.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Toast.makeText(getContext(), "Go To detail",
+                                                Toast.LENGTH_SHORT).show();
+                                        infoDialog.dismiss();
+                                    }
+                                });
                                 db.collection("campaigns")
                                         .whereEqualTo("campaignName", marker.getTitle()).get()
                                         .addOnSuccessListener(
@@ -252,7 +273,7 @@ public class Map extends Fragment {
                                                                                                 "100");
                                                                                 loadingProgress
                                                                                         .dismiss();
-                                                                                builder.show();
+                                                                                infoDialog.show();
                                                                             }
                                                                         }).addOnFailureListener(
                                                                 new OnFailureListener() {
@@ -274,22 +295,6 @@ public class Map extends Fragment {
                                         loadingProgress.dismiss();
                                     }
                                 });
-
-                                builder.setNegativeButton("Close",
-                                        new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                dialog.dismiss();
-                                            }
-                                        }).setPositiveButton("Detail",
-                                        new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                Toast.makeText(getContext(),
-                                                        "Go To Campaign Detail", Toast.LENGTH_SHORT)
-                                                        .show();
-                                            }
-                                        });
 
                                 return true;
                             }

@@ -3,65 +3,98 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@drawable/rounded_corner"
+    >
+
     <ImageView
         android:id="@+id/win_imageView"
         android:layout_width="150dp"
-        android:layout_height="120dp"
+        android:layout_height="125dp"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"
         app:layout_constraintEnd_toStartOf="@+id/win_info"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:srcCompat="@tools:sample/avatars" />
 
     <RelativeLayout
         android:id="@+id/win_info"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="261dp"
+        android:layout_height="125dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/win_imageView"
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:padding="5dp"
             android:id="@+id/win_txtCampaignName"
-            android:layout_alignParentTop="true"
-            android:layout_centerInParent="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerInParent="true"
+            android:padding="5dp"
             android:text="Campaign Name"
             android:textAlignment="center"
             android:textSize="20sp"
             android:textStyle="bold" />
 
         <TextView
-            android:drawablePadding="10dp"
-            android:padding="10dp"
-            android:gravity="center"
-            android:layout_centerInParent="true"
-            android:layout_below="@+id/win_txtCampaignName"
             android:id="@+id/win_txtStartDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/win_txtCampaignName"
+            android:layout_centerInParent="true"
             android:drawableStart="@drawable/ic_date_time"
+            android:drawablePadding="10dp"
+            android:gravity="center"
+            android:padding="10dp"
             android:text="20/11/2021"
             android:textAlignment="center"
             android:textSize="14sp" />
 
         <TextView
-            android:drawablePadding="10dp"
-            android:padding="10dp"
-            android:gravity="center"
-            android:layout_centerInParent="true"
-            android:layout_below="@+id/win_txtStartDate"
             android:id="@+id/win_txtNumVolunteer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/win_txtStartDate"
+            android:layout_centerInParent="true"
             android:drawableStart="@drawable/ic_baseline_people_volunteer"
+            android:drawablePadding="10dp"
+            android:gravity="center"
+            android:padding="10dp"
             android:text="100"
             android:textAlignment="center"
             android:textSize="14sp" />
     </RelativeLayout>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/linearLayoutCompat"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/win_imageView">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:textColor="@color/primary_color"
+            android:id="@+id/win_btnCancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground"
+            android:text="Cancel" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:background="?android:attr/selectableItemBackground"
+            android:textColor="@color/primary_color"
+            android:id="@+id/win_btnDetail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Detail" />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
