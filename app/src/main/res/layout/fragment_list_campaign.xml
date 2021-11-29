@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ListCampaign"
+    android:orientation="vertical"
+    >
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/listCam_edtSearch"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_below="@+id/map_wrapperBtn"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/custom_input_search"
+        android:drawableStart="@drawable/custom_search_icon"
+        android:drawablePadding="12dp"
+        android:ems="10"
+        android:focusable="auto"
+        android:hint="Campaign Name"
+        android:inputType="text"
+        android:paddingHorizontal="20dp"
+        android:paddingStart="20dp"
+        android:textSize="20dp"
+        />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:textStyle="bold"
+        android:textAppearance="@android:style/TextAppearance.Material.Large"
+        android:textAlignment="center"
+        android:text="List Campaigns"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/listCam_listViewCampaign"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+
+</androidx.appcompat.widget.LinearLayoutCompat>

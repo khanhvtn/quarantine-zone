@@ -67,8 +67,7 @@ public class MapsActivity extends AppCompatActivity implements IMapManagement {
                                 switchFragmentInMainActivity(new Map());
                                 break;
                             case R.id.nvb_campaigns:
-                                Toast.makeText(MapsActivity.this, "Campaign", Toast.LENGTH_SHORT)
-                                        .show();
+                                switchFragmentInMainActivity(new ListCampaign());
                                 break;
                             case R.id.nvb_report:
                                 Toast.makeText(MapsActivity.this, "Report", Toast.LENGTH_SHORT)

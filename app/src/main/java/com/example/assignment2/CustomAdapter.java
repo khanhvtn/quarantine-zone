@@ -1,0 +1,186 @@
+package com.example.assignment2;
+
+import android.content.DialogInterface;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.AppCompatImageButton;
+import androidx.appcompat.widget.AppCompatTextView;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.List;
+
+public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
+    private List<Campaign> campaignList;
+    private FirebaseFirestore db;
+    private AlertDialog loadingProcess;
+
+    public CustomAdapter(List<Campaign> campaignList) {
+        this.campaignList = campaignList;
+        db = FirebaseFirestore.getInstance();
+
+    }
+
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(parent.getContext());
+        builder.setView(R.layout.loading_progress);
+        loadingProcess = builder.create();
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.custom_item_list_campaign, parent, false);
+        return new ViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        Campaign campaign = this.campaignList.get(position);
+        holder.getListCam_txtCampaignName().setText(campaign.getCampaignName());
+        holder.getListCam_txtStartDate().setText(campaign.getStartDate());
+        holder.getListCam_txtVolunteer()
+                .setText(campaign.getListVolunteers().size() + " Volunteers");
+        holder.getListCam_txtTestedPeople().setText(100 + " Tested People");
+
+        holder.listCam_btnRemove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                builder.setTitle("Are you sure with your action?").setCancelable(false)
+                        .setPositiveButton(
+                                "Ok", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        loadingProcess.show();
+                                        int targetIndex = campaignList.indexOf(campaign);
+                                        db.collection("campaigns").whereEqualTo("campaignName",
+                                                campaign.getCampaignName()).get()
+                                                .addOnSuccessListener(
+                                                        new OnSuccessListener<QuerySnapshot>() {
+                                                            @Override
+                                                            public void onSuccess(
+                                                                    QuerySnapshot queryDocumentSnapshots) {
+                                                                String docId =
+                                                                        queryDocumentSnapshots
+                                                                                .getDocuments()
+                                                                                .get(0).getId();
+                                                                db.collection("campaigns")
+                                                                        .document(docId).delete()
+                                                                        .addOnSuccessListener(
+                                                                                new OnSuccessListener<Void>() {
+                                                                                    @Override
+                                                                                    public void onSuccess(
+                                                                                            Void unused) {
+                                                                                        campaignList
+                                                                                                .remove(targetIndex);
+                                                                                        notifyItemRemoved(
+                                                                                                targetIndex);
+                                                                                        Toast.makeText(
+                                                                                                v.getContext(),
+                                                                                                "Delete Successfully",
+                                                                                                Toast.LENGTH_SHORT)
+                                                                                                .show();
+                                                                                        loadingProcess
+                                                                                                .dismiss();
+                                                                                    }
+                                                                                })
+                                                                        .addOnFailureListener(
+                                                                                new OnFailureListener() {
+                                                                                    @Override
+                                                                                    public void onFailure(
+                                                                                            @NonNull
+                                                                                                    Exception e) {
+                                                                                        Toast.makeText(
+                                                                                                v.getContext(),
+                                                                                                e.getMessage(),
+                                                                                                Toast.LENGTH_SHORT)
+                                                                                                .show();
+                                                                                        loadingProcess
+                                                                                                .dismiss();
+                                                                                    }
+                                                                                });
+                                                            }
+                                                        })
+                                                .addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception e) {
+                                                        Toast.makeText(v.getContext(),
+                                                                e.getMessage(), Toast.LENGTH_SHORT)
+                                                                .show();
+                                                        loadingProcess.dismiss();
+                                                    }
+                                                });
+                                    }
+                                })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                builder.show();
+            }
+        });
+        holder.listCam_btnEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(loadingProcess.getContext(), campaign.getCampaignName() + " Detail",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
+    @Override
+    public int getItemCount() {
+        return campaignList.size();
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        private final AppCompatTextView listCam_txtCampaignName, listCam_txtStartDate,
+                listCam_txtVolunteer, listCam_txtTestedPeople;
+        private final AppCompatImageButton listCam_btnEdit, listCam_btnRemove;
+
+        public ViewHolder(@NonNull View view) {
+            super(view);
+            listCam_txtCampaignName = view.findViewById(R.id.listCam_txtCampaignName);
+            listCam_txtStartDate = view.findViewById(R.id.listCam_txtStartDate);
+            listCam_txtVolunteer = view.findViewById(R.id.listCam_txtVolunteer);
+            listCam_txtTestedPeople = view.findViewById(R.id.listCam_txtTestedPeople);
+            listCam_btnRemove = view.findViewById(R.id.listCam_btnRemove);
+            listCam_btnEdit = view.findViewById(R.id.listCam_btnEdit);
+        }
+
+        public AppCompatTextView getListCam_txtCampaignName() {
+            return listCam_txtCampaignName;
+        }
+
+        public AppCompatTextView getListCam_txtStartDate() {
+            return listCam_txtStartDate;
+        }
+
+        public AppCompatTextView getListCam_txtVolunteer() {
+            return listCam_txtVolunteer;
+        }
+
+        public AppCompatTextView getListCam_txtTestedPeople() {
+            return listCam_txtTestedPeople;
+        }
+
+        public AppCompatImageButton getListCam_btnEdit() {
+            return listCam_btnEdit;
+        }
+
+        public AppCompatImageButton getListCam_btnRemove() {
+            return listCam_btnRemove;
+        }
+    }
+}
