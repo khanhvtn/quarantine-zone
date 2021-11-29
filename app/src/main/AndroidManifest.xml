@@ -18,6 +18,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Assignment2">
         <activity
+            android:name=".EditCampaignActivity"
+            android:exported="false" />
+        <activity
             android:name=".CampaignDetailActivity"
             android:exported="false" />
 

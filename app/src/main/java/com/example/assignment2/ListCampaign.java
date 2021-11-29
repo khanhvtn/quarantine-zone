@@ -2,6 +2,10 @@ package com.example.assignment2;
 
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
@@ -28,6 +32,7 @@ public class ListCampaign extends Fragment {
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
     private AlertDialog loadingProcess;
+    private ActivityResultLauncher editActivityLauncher;
 
 
     public ListCampaign() {
@@ -37,7 +42,7 @@ public class ListCampaign extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        db =FirebaseFirestore.getInstance();
+        db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setView(R.layout.loading_progress);
@@ -52,17 +57,47 @@ public class ListCampaign extends Fragment {
         listCam_listViewCampaign = view.findViewById(R.id.listCam_listViewCampaign);
         listCam_listViewCampaign.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        //Create Adapter for Recycler View
+        CustomAdapter customAdapter = new CustomAdapter();
+
+        editActivityLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                new ActivityResultCallback<ActivityResult>() {
+                    @Override
+                    public void onActivityResult(ActivityResult result) {
+                        if (result != null) {
+                            Campaign updatedCampaign =
+                                    result.getData().getParcelableExtra("updated_campaign");
+                            Campaign oldCampaign =
+                                    result.getData().getParcelableExtra("old_campaign");
+                            for (Campaign campaign: customAdapter.getCampaignList()){
+                                if(campaign.getCampaignName().equals(oldCampaign.getCampaignName())){
+                                    customAdapter.getCampaignList().remove(campaign);
+                                    break;
+                                }
+                            }
+                            customAdapter.getCampaignList().add(updatedCampaign);
+                            customAdapter.notifyDataSetChanged();
+                        }
+                    }
+                });
+
         //get list event
         loadingProcess.show();
-        db.collection("campaigns").whereEqualTo("creatorId", mAuth.getCurrentUser().getUid()).get().addOnSuccessListener(
-                new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        List<Campaign> campaignList = queryDocumentSnapshots.toObjects(Campaign.class);
-                        listCam_listViewCampaign.setAdapter(new CustomAdapter(campaignList));
-                        loadingProcess.dismiss();
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
+
+        db.collection("campaigns").whereEqualTo("creatorId", mAuth.getCurrentUser().getUid()).get()
+                .addOnSuccessListener(
+                        new OnSuccessListener<QuerySnapshot>() {
+                            @Override
+                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                List<Campaign> campaignList =
+                                        queryDocumentSnapshots.toObjects(Campaign.class);
+                                customAdapter.setCampaignList(campaignList);
+                                customAdapter.setEditActivityLauncher(editActivityLauncher);
+                                listCam_listViewCampaign.setAdapter(customAdapter);
+                                loadingProcess.dismiss();
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
                 loadingProcess.dismiss();
@@ -70,5 +105,10 @@ public class ListCampaign extends Fragment {
             }
         });
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
     }
 }

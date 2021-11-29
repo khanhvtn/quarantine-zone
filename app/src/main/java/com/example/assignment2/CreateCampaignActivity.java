@@ -46,9 +46,6 @@ public class CreateCampaignActivity extends AppCompatActivity
         implements CaptureImageDialogFragment.NoticeDialogListener {
     private static final String ACTIVITY_TAG = "CreateCampaign";
     private static final String CAPTURE_IMAGE_DIALOG_TAG = "CAPTURE_IMAGE_DIALOG_TAG";
-    private static final int REQUEST_ID_READ_WRITE_PERMISSION = 99;
-    private static final int REQUEST_ID_IMAGE_CAPTURE = 100;
-    private static final int REQUEST_ID_VIDEO_CAPTURE = 101;
     private AppCompatButton crCamBtnBack, crCamBtnCreate, crCamBtnChangeImage, crCamBtnRemoveImage;
     private AppCompatImageButton crCamBtnPickDate;
     private AppCompatEditText crCamEdtCampaignName, crCamEdtOrganization, crCamEdtStartDate,
@@ -213,7 +210,7 @@ public class CreateCampaignActivity extends AppCompatActivity
                                     uploadTask.addOnFailureListener(new OnFailureListener() {
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
-                                            db.collection("events")
+                                            db.collection("campaigns")
                                                     .document(documentReference.getId()).delete();
                                             Toast.makeText(CreateCampaignActivity.this,
                                                     "Something went wrong with uploading image. Please try again!!!",

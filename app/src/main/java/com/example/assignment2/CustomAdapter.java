@@ -1,33 +1,44 @@
 package com.example.assignment2;
 
+import android.app.Activity;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContract;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.appcompat.widget.AppCompatTextView;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.List;
 
 public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
     private List<Campaign> campaignList;
     private FirebaseFirestore db;
+    private FirebaseStorage firebaseStorage;
     private AlertDialog loadingProcess;
+    private ActivityResultLauncher editActivityLauncher;
 
-    public CustomAdapter(List<Campaign> campaignList) {
-        this.campaignList = campaignList;
+    public CustomAdapter() {
         db = FirebaseFirestore.getInstance();
-
+        firebaseStorage = FirebaseStorage.getInstance();
     }
 
     @NonNull
@@ -36,8 +47,10 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
         AlertDialog.Builder builder = new AlertDialog.Builder(parent.getContext());
         builder.setView(R.layout.loading_progress);
         loadingProcess = builder.create();
+
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.custom_item_list_campaign, parent, false);
+
         return new ViewHolder(view);
     }
 
@@ -48,7 +61,8 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
         holder.getListCam_txtStartDate().setText(campaign.getStartDate());
         holder.getListCam_txtVolunteer()
                 .setText(campaign.getListVolunteers().size() + " Volunteers");
-        holder.getListCam_txtTestedPeople().setText(100 + " Tested People");
+        holder.getListCam_txtTestedPeople()
+                .setText(campaign.getNumberTestedPeople().toString() + " Tested People");
 
         holder.listCam_btnRemove.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -79,17 +93,45 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
                                                                                     @Override
                                                                                     public void onSuccess(
                                                                                             Void unused) {
-                                                                                        campaignList
-                                                                                                .remove(targetIndex);
-                                                                                        notifyItemRemoved(
-                                                                                                targetIndex);
-                                                                                        Toast.makeText(
-                                                                                                v.getContext(),
-                                                                                                "Delete Successfully",
-                                                                                                Toast.LENGTH_SHORT)
-                                                                                                .show();
-                                                                                        loadingProcess
-                                                                                                .dismiss();
+                                                                                        firebaseStorage
+                                                                                                .getReference()
+                                                                                                .child("images/" +
+                                                                                                        campaign.getImageFileName())
+                                                                                                .delete()
+                                                                                                .addOnSuccessListener(
+                                                                                                        new OnSuccessListener<Void>() {
+                                                                                                            @Override
+                                                                                                            public void onSuccess(
+                                                                                                                    Void unused) {
+                                                                                                                campaignList
+                                                                                                                        .remove(targetIndex);
+                                                                                                                notifyItemRemoved(
+                                                                                                                        targetIndex);
+                                                                                                                Toast.makeText(
+                                                                                                                        v.getContext(),
+                                                                                                                        "Delete Successfully",
+                                                                                                                        Toast.LENGTH_SHORT)
+                                                                                                                        .show();
+                                                                                                                loadingProcess
+                                                                                                                        .dismiss();
+                                                                                                            }
+                                                                                                        })
+                                                                                                .addOnFailureListener(
+                                                                                                        new OnFailureListener() {
+                                                                                                            @Override
+                                                                                                            public void onFailure(
+                                                                                                                    @NonNull
+                                                                                                                            Exception e) {
+                                                                                                                Toast.makeText(
+                                                                                                                        v.getContext(),
+                                                                                                                        e.getMessage(),
+                                                                                                                        Toast.LENGTH_SHORT)
+                                                                                                                        .show();
+                                                                                                                loadingProcess
+                                                                                                                        .dismiss();
+                                                                                                            }
+                                                                                                        });
+
                                                                                     }
                                                                                 })
                                                                         .addOnFailureListener(
@@ -132,8 +174,9 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
         holder.listCam_btnEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(loadingProcess.getContext(), campaign.getCampaignName() + " Detail",
-                        Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(v.getContext(), EditCampaignActivity.class);
+                intent.putExtra("campaign", campaign);
+                editActivityLauncher.launch(intent);
             }
         });
     }
@@ -182,5 +225,21 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
         public AppCompatImageButton getListCam_btnRemove() {
             return listCam_btnRemove;
         }
+    }
+
+    public List<Campaign> getCampaignList() {
+        return campaignList;
+    }
+
+    public void setCampaignList(List<Campaign> campaignList) {
+        this.campaignList = campaignList;
+    }
+
+    public ActivityResultLauncher getEditActivityLauncher() {
+        return editActivityLauncher;
+    }
+
+    public void setEditActivityLauncher(ActivityResultLauncher editActivityLauncher) {
+        this.editActivityLauncher = editActivityLauncher;
     }
 }

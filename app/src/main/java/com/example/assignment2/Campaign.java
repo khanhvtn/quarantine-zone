@@ -9,6 +9,7 @@ import java.util.ArrayList;
 public class Campaign implements Parcelable {
     private Double longitude, latitude;
     private String campaignName, organization, startDate, description, creatorId, imageFileName;
+    private Integer numberTestedPeople = 0;
     private ArrayList<String> listVolunteers = new ArrayList<>();
 
     public Campaign() {
@@ -26,6 +27,7 @@ public class Campaign implements Parcelable {
         this.creatorId = creatorId;
     }
 
+
     protected Campaign(Parcel in) {
         if (in.readByte() == 0) {
             longitude = null;
@@ -42,34 +44,13 @@ public class Campaign implements Parcelable {
         startDate = in.readString();
         description = in.readString();
         creatorId = in.readString();
-    }
-
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        if (longitude == null) {
-            dest.writeByte((byte) 0);
+        imageFileName = in.readString();
+        if (in.readByte() == 0) {
+            numberTestedPeople = null;
         } else {
-            dest.writeByte((byte) 1);
-            dest.writeDouble(longitude);
+            numberTestedPeople = in.readInt();
         }
-        if (latitude == null) {
-            dest.writeByte((byte) 0);
-        } else {
-            dest.writeByte((byte) 1);
-            dest.writeDouble(latitude);
-        }
-        dest.writeString(campaignName);
-        dest.writeString(organization);
-        dest.writeString(startDate);
-        dest.writeString(description);
-        dest.writeString(creatorId);
-        dest.writeString(imageFileName);
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
+        listVolunteers = in.createStringArrayList();
     }
 
     public static final Creator<Campaign> CREATOR = new Creator<Campaign>() {
@@ -154,5 +135,47 @@ public class Campaign implements Parcelable {
 
     public void setListVolunteers(ArrayList<String> listVolunteers) {
         this.listVolunteers = listVolunteers;
+    }
+
+    public Integer getNumberTestedPeople() {
+        return numberTestedPeople;
+    }
+
+    public void setNumberTestedPeople(Integer numberTestedPeople) {
+        this.numberTestedPeople = numberTestedPeople;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        if (longitude == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeDouble(longitude);
+        }
+        if (latitude == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeDouble(latitude);
+        }
+        dest.writeString(campaignName);
+        dest.writeString(organization);
+        dest.writeString(startDate);
+        dest.writeString(description);
+        dest.writeString(creatorId);
+        dest.writeString(imageFileName);
+        if (numberTestedPeople == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(numberTestedPeople);
+        }
+        dest.writeStringList(listVolunteers);
     }
 }
