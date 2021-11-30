@@ -19,12 +19,17 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.appcompat.widget.LinearLayoutCompat;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -56,13 +61,15 @@ import com.google.maps.android.clustering.ClusterManager;
 
 import java.util.List;
 
-public class Map extends Fragment {
+public class Map extends Fragment implements SearchView.OnQueryTextListener {
 
     private FirebaseFirestore db;
     private GoogleMap mMap;
     private Button btnLogin, btnRegister;
-    private LinearLayoutCompat wrapperBtn;
-    private EditText edtSearch;
+    private LinearLayoutCompat wrapperBtn, map_wrapperSearch;
+    private SearchView edtSearch;
+    private RecyclerView searchResult;
+    private SearchCampaignAdapter searchCampaignAdapter;
     private FirebaseAuth mAuth;
     private FirebaseStorage firebaseStorage;
     private FragmentManager fm;
@@ -120,9 +127,14 @@ public class Map extends Fragment {
 
         //declare fields
         wrapperBtn = view.findViewById(R.id.map_wrapperBtn);
+        map_wrapperSearch = view.findViewById(R.id.map_wrapperSearch);
         edtSearch = view.findViewById(R.id.map_edtSearch);
         btnLogin = view.findViewById(R.id.map_btnLogin);
         btnRegister = view.findViewById(R.id.map_btnRegister);
+        searchResult = view.findViewById(R.id.map_edtSearchResult);
+
+
+        edtSearch.setOnQueryTextListener(this);
 
         //config fragment
         fm = getParentFragmentManager();
@@ -133,6 +145,8 @@ public class Map extends Fragment {
                         R.anim.fade_in,   // popEnter
                         R.anim.slide_out  // popExit
                 );
+
+        searchResult.addOnItemTouchListener(new RecyclerView.SimpleOnItemTouchListener());
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -168,7 +182,7 @@ public class Map extends Fragment {
                 // Move camera to RMIT Vietnam Location
                 // Position the map.
                 LatLng rmitLocation = new LatLng(10.729567, 106.6930756);
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(rmitLocation, 15));
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(rmitLocation, 12));
                 mMap.getUiSettings().setZoomControlsEnabled(true);
                 mMap.getUiSettings().setMyLocationButtonEnabled(true);
 
@@ -311,9 +325,14 @@ public class Map extends Fragment {
                             @Override
                             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                 if (task.isSuccessful()) {
-                                    for (QueryDocumentSnapshot document : task.getResult()) {
-                                        Campaign campaign = document.toObject(Campaign.class);
-
+                                    List<Campaign> campaignList = task.getResult().toObjects(Campaign.class);
+//                                    searchCampaignAdapter.setCampaignList(campaignList);
+//                                    searchCampaignAdapter.setBackupList(campaignList);
+                                    //config search campaign adapter
+                                    searchCampaignAdapter = new SearchCampaignAdapter(searchResult, mMap, campaignList, edtSearch);
+                                    searchResult.setLayoutManager(new LinearLayoutManager(getContext()));
+                                    searchResult.setAdapter(searchCampaignAdapter);
+                                    for (Campaign campaign : campaignList) {
                                         MarkerItem markerItem = new MarkerItem(
                                                 campaign.getLatitude(), campaign.getLongitude(),
                                                 campaign.getCampaignName(),
@@ -420,5 +439,29 @@ public class Map extends Fragment {
             }
 
         }
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        edtSearch.clearFocus();
+        searchCampaignAdapter.filter("");
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String searchText) {
+        if(!searchText.isEmpty()){
+            searchResult.setVisibility(View.VISIBLE);
+        }else{
+            searchResult.setVisibility(View.GONE);
+        }
+        searchCampaignAdapter.filter(searchText);
+        return false;
+    }
+
+    private void ToastMessage(String message){
+        Toast toast = Toast.makeText(getContext(), message, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.CENTER, 0,0);
+        toast.show();
     }
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -43,25 +44,37 @@
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
-
-    <androidx.appcompat.widget.AppCompatEditText
-        android:id="@+id/map_edtSearch"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:background="@drawable/wrapper_search"
+        android:id="@+id/map_wrapperSearch"
         android:layout_below="@+id/map_wrapperBtn"
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="10dp"
-        android:background="@drawable/custom_input_search"
-        android:drawableStart="@drawable/custom_search_icon"
-        android:drawablePadding="12dp"
-        android:ems="10"
-        android:focusable="auto"
-        android:hint="Search your location"
-        android:inputType="text"
-        android:paddingHorizontal="20dp"
-        android:paddingStart="20dp"
-        android:textSize="20dp" />
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <androidx.appcompat.widget.SearchView
+            android:background="@drawable/rounded_corner"
+            android:id="@+id/map_edtSearch"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:ems="10"
+            android:paddingHorizontal="20dp"
+            android:paddingStart="20dp"
+            app:iconifiedByDefault="false"
+            app:queryHint="Search your location" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_marginBottom="20dp"
+            android:visibility="gone"
+            android:background="@color/white"
+            android:id="@+id/map_edtSearchResult"
+            android:paddingHorizontal="40dp"
+            android:layout_below="@+id/map_edtSearch"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
 
 </RelativeLayout>
