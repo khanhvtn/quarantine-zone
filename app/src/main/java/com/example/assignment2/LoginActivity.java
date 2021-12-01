@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.assignment2.directionhelpers.TaskLoadedCallback;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -59,13 +60,13 @@ public class LoginActivity extends AppCompatActivity {
                 loadingProgress.show();
                 String email = edtEmail.getText().toString().trim();
                 String password = edtPassword.getText().toString().trim();
-                String validateResult= validateUserInput();
+                String validateResult = validateUserInput();
 
-                if(validateUserInput() != null){
+                if (validateUserInput() != null) {
                     Toast.makeText(v.getContext(), validateResult,
                             Toast.LENGTH_SHORT).show();
                     loadingProgress.dismiss();
-                }else{
+                } else {
                     mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(
                             new OnCompleteListener<AuthResult>() {
                                 @Override
@@ -115,5 +116,4 @@ public class LoginActivity extends AppCompatActivity {
             return null;
         }
     }
-
 }

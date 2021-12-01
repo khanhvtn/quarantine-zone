@@ -88,6 +88,15 @@
         <androidx.appcompat.widget.AppCompatButton
             android:background="?android:attr/selectableItemBackground"
             android:textColor="@color/primary_color"
+            android:id="@+id/win_btnMakeRoute"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Make Route" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:background="?android:attr/selectableItemBackground"
+            android:textColor="@color/primary_color"
             android:id="@+id/win_btnDetail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -1,6 +1,7 @@
 package com.example.assignment2;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -37,6 +38,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.assignment2.directionhelpers.FetchURL;
+import com.example.assignment2.directionhelpers.TaskLoadedCallback;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -46,6 +49,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -57,6 +62,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 
 import java.util.List;
@@ -168,6 +174,7 @@ public class Map extends Fragment implements SearchView.OnQueryTextListener {
             public void onMapReady(GoogleMap googleMap) {
                 //Map
                 mMap = googleMap;
+                listener.setMap(mMap);
 
                 // Initialize the manager with the context and the map.
                 // (Activity extends context, so we can pass 'this' in the constructor.)
@@ -184,7 +191,7 @@ public class Map extends Fragment implements SearchView.OnQueryTextListener {
                 LatLng rmitLocation = new LatLng(10.729567, 106.6930756);
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(rmitLocation, 12));
                 mMap.getUiSettings().setZoomControlsEnabled(true);
-                mMap.getUiSettings().setMyLocationButtonEnabled(true);
+                mMap.getUiSettings().setMapToolbarEnabled(false);
 
                 //set onClick Map
                 mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
@@ -215,6 +222,14 @@ public class Map extends Fragment implements SearchView.OnQueryTextListener {
                         }
                     }
                 });
+                //on cluster click
+                clusterManager.setOnClusterClickListener(
+                        new ClusterManager.OnClusterClickListener<MarkerItem>() {
+                            @Override
+                            public boolean onClusterClick(Cluster<MarkerItem> cluster) {
+                                return false;
+                            }
+                        });
                 //on Marker Click
                 clusterManager.setOnClusterItemClickListener(
                         new ClusterManager.OnClusterItemClickListener<MarkerItem>() {
@@ -236,6 +251,8 @@ public class Map extends Fragment implements SearchView.OnQueryTextListener {
                                         view.findViewById(R.id.win_btnCancel);
                                 AppCompatButton btnDetail =
                                         view.findViewById(R.id.win_btnDetail);
+                                AppCompatButton btnMakeRoute =
+                                        view.findViewById(R.id.win_btnMakeRoute);
                                 builder.setView(view);
                                 AlertDialog infoDialog = builder.create();
 
@@ -253,6 +270,17 @@ public class Map extends Fragment implements SearchView.OnQueryTextListener {
                                                 CampaignDetailActivity.class);
                                         intent.putExtra("campaignName", marker.getTitle());
                                         startActivity(intent);
+                                    }
+                                });
+                                btnMakeRoute.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        ToastMessage("Make Route");
+                                        new FetchURL(getContext()).execute(
+                                                getUrl(listener.getUserLocation(),
+                                                        marker.getPosition(), "driving"),
+                                                "driving");
+                                        infoDialog.dismiss();
                                     }
                                 });
                                 db.collection("campaigns")
@@ -325,12 +353,14 @@ public class Map extends Fragment implements SearchView.OnQueryTextListener {
                             @Override
                             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                 if (task.isSuccessful()) {
-                                    List<Campaign> campaignList = task.getResult().toObjects(Campaign.class);
-//                                    searchCampaignAdapter.setCampaignList(campaignList);
-//                                    searchCampaignAdapter.setBackupList(campaignList);
+                                    List<Campaign> campaignList =
+                                            task.getResult().toObjects(Campaign.class);
                                     //config search campaign adapter
-                                    searchCampaignAdapter = new SearchCampaignAdapter(searchResult, mMap, campaignList, edtSearch);
-                                    searchResult.setLayoutManager(new LinearLayoutManager(getContext()));
+                                    searchCampaignAdapter =
+                                            new SearchCampaignAdapter(searchResult, mMap,
+                                                    campaignList, edtSearch);
+                                    searchResult.setLayoutManager(
+                                            new LinearLayoutManager(getContext()));
                                     searchResult.setAdapter(searchCampaignAdapter);
                                     for (Campaign campaign : campaignList) {
                                         MarkerItem markerItem = new MarkerItem(
@@ -450,18 +480,38 @@ public class Map extends Fragment implements SearchView.OnQueryTextListener {
 
     @Override
     public boolean onQueryTextChange(String searchText) {
-        if(!searchText.isEmpty()){
+        if (!searchText.isEmpty()) {
             searchResult.setVisibility(View.VISIBLE);
-        }else{
+        } else {
             searchResult.setVisibility(View.GONE);
         }
         searchCampaignAdapter.filter(searchText);
         return false;
     }
 
-    private void ToastMessage(String message){
+    private void ToastMessage(String message) {
         Toast toast = Toast.makeText(getContext(), message, Toast.LENGTH_SHORT);
-        toast.setGravity(Gravity.CENTER, 0,0);
+        toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
     }
+
+    private String getUrl(LatLng origin, LatLng dest, String directionMode) {
+        // Origin of route
+        String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
+        // Destination of route
+        String str_dest = "destination=" + dest.latitude + "," + dest.longitude;
+        // Mode
+        String mode = "mode=" + directionMode;
+        // Building the parameters to the web service
+        String parameters = str_origin + "&" + str_dest + "&" + mode;
+        // Output format
+        String output = "json";
+        // Building the url to the web service
+        String url =
+                "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters +
+                        "&key=" + getString(R.string.direction_api_key);
+        return url;
+    }
+
+
 }
