@@ -3,6 +3,7 @@ package com.example.assignment2;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,16 +28,26 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
-    private List<Campaign> campaignList;
+    private List<Campaign> campaignList ;
+    private ArrayList<Campaign> backupList = new ArrayList<>();
     private FirebaseFirestore db;
     private FirebaseStorage firebaseStorage;
     private AlertDialog loadingProcess;
     private ActivityResultLauncher editActivityLauncher;
+    private Pattern p;
+    private Matcher m;
 
-    public CustomAdapter() {
+    public CustomAdapter(List<Campaign> campaignList,
+                         ActivityResultLauncher editActivityLauncher) {
+        this.campaignList = campaignList;
+        this.backupList.addAll(campaignList) ;
+        this.editActivityLauncher = editActivityLauncher;
         db = FirebaseFirestore.getInstance();
         firebaseStorage = FirebaseStorage.getInstance();
     }
@@ -241,5 +252,23 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
 
     public void setEditActivityLauncher(ActivityResultLauncher editActivityLauncher) {
         this.editActivityLauncher = editActivityLauncher;
+    }
+
+    public void filter(String searchText) {
+        this.campaignList.clear();
+        if (searchText.isEmpty()) {
+            this.campaignList.addAll(this.backupList);
+        } else {
+            p = Pattern.compile(searchText, Pattern.CASE_INSENSITIVE);
+            for (Campaign campaign : this.backupList) {
+
+                m = p.matcher(campaign.getCampaignName());
+                if (m.find()) {
+                    this.campaignList.add(campaign);
+                }
+            }
+        }
+        notifyDataSetChanged();
+
     }
 }

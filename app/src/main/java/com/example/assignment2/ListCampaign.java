@@ -8,10 +8,12 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,12 +29,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ListCampaign extends Fragment {
+public class ListCampaign extends Fragment implements SearchView.OnQueryTextListener{
     private RecyclerView listCam_listViewCampaign;
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
     private AlertDialog loadingProcess;
     private ActivityResultLauncher editActivityLauncher;
+    private SearchView listCam_edtSearch;
+    private  CustomAdapter customAdapter;
 
 
     public ListCampaign() {
@@ -54,11 +58,12 @@ public class ListCampaign extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_list_campaign, container, false);
+        listCam_edtSearch = view.findViewById(R.id.listCam_edtSearch);
         listCam_listViewCampaign = view.findViewById(R.id.listCam_listViewCampaign);
         listCam_listViewCampaign.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        //Create Adapter for Recycler View
-        CustomAdapter customAdapter = new CustomAdapter();
+        //add listener
+        listCam_edtSearch.setOnQueryTextListener(this);
 
         editActivityLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -92,8 +97,8 @@ public class ListCampaign extends Fragment {
                             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                                 List<Campaign> campaignList =
                                         queryDocumentSnapshots.toObjects(Campaign.class);
-                                customAdapter.setCampaignList(campaignList);
-                                customAdapter.setEditActivityLauncher(editActivityLauncher);
+                                //Create Adapter for Recycler View
+                                 customAdapter = new CustomAdapter(campaignList, editActivityLauncher);
                                 listCam_listViewCampaign.setAdapter(customAdapter);
                                 loadingProcess.dismiss();
                             }
@@ -110,5 +115,22 @@ public class ListCampaign extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        customAdapter.filter(newText);
+        return false;
+    }
+
+    private void ToastMessage(String message){
+        Toast toast = Toast.makeText(getContext(), message, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.CENTER, 0,0);
+        toast.show();
     }
 }
