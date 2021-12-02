@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    tools:context=".GenerateReport">
+    tools:context=".fragments.GenerateReport">
 
     <androidx.appcompat.widget.SearchView
         android:id="@+id/genRe_edtSearch"

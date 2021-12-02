@@ -1,4 +1,4 @@
-package com.example.assignment2;
+package com.example.assignment2.fragments;
 
 import android.os.Bundle;
 
@@ -14,6 +14,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.example.assignment2.IMapManagement;
+import com.example.assignment2.R;
+import com.example.assignment2.fragments.Map;
+import com.example.assignment2.models.User;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -66,6 +70,7 @@ public class UserProfile extends Fragment {
             public void onClick(View v) {
                 mAuth.signOut();
                 listener.setCurrentUser(null);
+                listener.getListenerRegistrationNotification().remove();
                 listener.UpdateBottomNavigationBar();
                 listener.switchFragmentInMainActivity(new Map());
             }

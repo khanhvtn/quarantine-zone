@@ -1,9 +1,8 @@
-package com.example.assignment2;
+package com.example.assignment2.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class Campaign implements Parcelable {

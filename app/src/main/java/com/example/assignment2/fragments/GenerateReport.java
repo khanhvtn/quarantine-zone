@@ -1,4 +1,4 @@
-package com.example.assignment2;
+package com.example.assignment2.fragments;
 
 import android.os.Bundle;
 
@@ -8,6 +8,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -19,27 +20,31 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.example.assignment2.adapters.CustomAdapter;
+import com.example.assignment2.R;
+import com.example.assignment2.models.Campaign;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import java.util.ArrayList;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 
-
-public class ListCampaign extends Fragment implements SearchView.OnQueryTextListener{
-    private RecyclerView listCam_listViewCampaign;
+public class GenerateReport extends Fragment implements SearchView.OnQueryTextListener {
+    private RecyclerView genRe_listViewCampaign;
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
     private AlertDialog loadingProcess;
     private ActivityResultLauncher editActivityLauncher;
-    private SearchView listCam_edtSearch;
-    private  CustomAdapter customAdapter;
+    private SearchView genRe_edtSearch;
+    private AppCompatButton genRe_btnGenReport;
+    private CustomAdapter customAdapter;
 
-
-    public ListCampaign() {
+    public GenerateReport() {
         // Required empty public constructor
     }
 
@@ -57,13 +62,21 @@ public class ListCampaign extends Fragment implements SearchView.OnQueryTextList
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_list_campaign, container, false);
-        listCam_edtSearch = view.findViewById(R.id.listCam_edtSearch);
-        listCam_listViewCampaign = view.findViewById(R.id.listCam_listViewCampaign);
-        listCam_listViewCampaign.setLayoutManager(new LinearLayoutManager(getContext()));
+        View view = inflater.inflate(R.layout.fragment_generate_report, container, false);
+        genRe_edtSearch = view.findViewById(R.id.genRe_edtSearch);
+        genRe_listViewCampaign = view.findViewById(R.id.genRe_listViewCampaign);
+        genRe_btnGenReport = view.findViewById(R.id.genRe_btnGenReport);
+        genRe_listViewCampaign.setLayoutManager(new LinearLayoutManager(getContext()));
 
         //add listener
-        listCam_edtSearch.setOnQueryTextListener(this);
+        genRe_edtSearch.setOnQueryTextListener(this);
+        genRe_btnGenReport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                GenerateReport();
+            }
+        });
+
 
         editActivityLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -75,8 +88,9 @@ public class ListCampaign extends Fragment implements SearchView.OnQueryTextList
                                     result.getData().getParcelableExtra("updated_campaign");
                             Campaign oldCampaign =
                                     result.getData().getParcelableExtra("old_campaign");
-                            for (Campaign campaign: customAdapter.getCampaignList()){
-                                if(campaign.getCampaignName().equals(oldCampaign.getCampaignName())){
+                            for (Campaign campaign : customAdapter.getCampaignList()) {
+                                if (campaign.getCampaignName()
+                                        .equals(oldCampaign.getCampaignName())) {
                                     customAdapter.getCampaignList().remove(campaign);
                                     break;
                                 }
@@ -90,7 +104,7 @@ public class ListCampaign extends Fragment implements SearchView.OnQueryTextList
         //get list event
         loadingProcess.show();
 
-        db.collection("campaigns").whereEqualTo("creatorId", mAuth.getCurrentUser().getUid()).get()
+        db.collection("campaigns").get()
                 .addOnSuccessListener(
                         new OnSuccessListener<QuerySnapshot>() {
                             @Override
@@ -98,8 +112,9 @@ public class ListCampaign extends Fragment implements SearchView.OnQueryTextList
                                 List<Campaign> campaignList =
                                         queryDocumentSnapshots.toObjects(Campaign.class);
                                 //Create Adapter for Recycler View
-                                 customAdapter = new CustomAdapter(campaignList, editActivityLauncher);
-                                listCam_listViewCampaign.setAdapter(customAdapter);
+                                customAdapter =
+                                        new CustomAdapter(campaignList, editActivityLauncher);
+                                genRe_listViewCampaign.setAdapter(customAdapter);
                                 loadingProcess.dismiss();
                             }
                         }).addOnFailureListener(new OnFailureListener() {
@@ -128,9 +143,40 @@ public class ListCampaign extends Fragment implements SearchView.OnQueryTextList
         return false;
     }
 
-    private void ToastMessage(String message){
+    private void ToastMessage(String message) {
         Toast toast = Toast.makeText(getContext(), message, Toast.LENGTH_SHORT);
-        toast.setGravity(Gravity.CENTER, 0,0);
+        toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
+    }
+
+    private void GenerateReport() {
+        loadingProcess.show();
+        File dir = new File(getContext().getFilesDir(), "reports");
+        if (!dir.exists()) {
+            dir.mkdir();
+        }
+        File reportFile = new File(dir, "report.csv");
+        try {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder
+                    .append("Campaign Name,Organization,Start Date,Description,Number of Volunteers,Number of Tested People\n");
+            FileWriter writer = new FileWriter(reportFile);
+            for (Campaign campaign : customAdapter.getBackupList()) {
+                stringBuilder.append(String.format("\"%s\",\"%s\",\"%s\",\"%s\",%d,%d\n", campaign.getCampaignName(),
+                        campaign.getOrganization(), campaign.getStartDate(),
+                        campaign.getDescription(), campaign.getListVolunteers().size(),
+                        campaign.getNumberTestedPeople()));
+            }
+            writer.append(stringBuilder.toString());
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            ToastMessage("Something went wrong. Please try again!!!");
+            loadingProcess.dismiss();
+        }
+        loadingProcess.dismiss();
+        ToastMessage("Generate Report Successfully!!!");
+
     }
 }

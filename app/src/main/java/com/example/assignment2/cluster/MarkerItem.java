@@ -1,4 +1,4 @@
-package com.example.assignment2;
+package com.example.assignment2.cluster;
 
 import android.net.Uri;
 

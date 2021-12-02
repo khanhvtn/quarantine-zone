@@ -1,4 +1,4 @@
-package com.example.assignment2;
+package com.example.assignment2.cluster;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -6,11 +6,11 @@ import android.graphics.drawable.BitmapDrawable;
 
 import androidx.annotation.NonNull;
 
+import com.example.assignment2.R;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.Cluster;
-import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 

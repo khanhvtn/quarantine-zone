@@ -22,10 +22,11 @@ import android.widget.DatePicker;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.assignment2.models.Campaign;
+import com.example.assignment2.models.CaptureImageDialogFragment;
+import com.example.assignment2.models.Notification;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
@@ -39,6 +40,7 @@ public class EditCampaignActivity extends AppCompatActivity
         implements CaptureImageDialogFragment.NoticeDialogListener {
     private static final String ACTIVITY_TAG = "EditCampaign";
     private static final String CAPTURE_IMAGE_DIALOG_TAG = "CAPTURE_IMAGE_DIALOG_TAG";
+    private static final String EDIT_CAMPAIGN_TAG = "EditCampaignActivity";
     private AppCompatButton edtCamBtnBack, edtCamBtnEdit, edtCamBtnChangeImage,
             edtCamBtnRemoveImage;
     private AppCompatImageButton edtCamBtnPickDate;
@@ -155,7 +157,7 @@ public class EditCampaignActivity extends AppCompatActivity
         edtCamBtnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                onBackPressed();
             }
         });
 
@@ -215,6 +217,7 @@ public class EditCampaignActivity extends AppCompatActivity
                     updatedCampaign.setOrganization(organization);
                     updatedCampaign.setStartDate(startDate);
                     updatedCampaign.setDescription(description);
+                    updatedCampaign.setListVolunteers(currentCampaign.getListVolunteers());
                     updatedCampaign.setNumberTestedPeople(Integer.parseInt(testedPeople));
                     updatedCampaign.setCreatorId(currentCampaign.getCreatorId());
                     updatedCampaign.setImageFileName(currentCampaign.getImageFileName());
@@ -281,6 +284,9 @@ public class EditCampaignActivity extends AppCompatActivity
                                                                                                                 .putExtra(
                                                                                                                         "old_campaign",
                                                                                                                         currentCampaign));
+                                                                                                SendNotificationForVolunteers(
+                                                                                                        currentCampaign,
+                                                                                                        updatedCampaign);
                                                                                                 finish();
                                                                                             }
                                                                                         });
@@ -297,6 +303,10 @@ public class EditCampaignActivity extends AppCompatActivity
                                                                                         .putExtra(
                                                                                                 "old_campaign",
                                                                                                 currentCampaign));
+                                                                        SendNotificationForVolunteers(
+                                                                                currentCampaign,
+                                                                                updatedCampaign);
+
                                                                         finish();
                                                                     }
                                                                 }
@@ -373,5 +383,21 @@ public class EditCampaignActivity extends AppCompatActivity
 
     private void ToastMessage(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    private void SendNotificationForVolunteers(Campaign currentCampaign, Campaign updatedCampaign) {
+        for (String volunteerId : updatedCampaign.getListVolunteers()) {
+            Notification notification =
+                    new Notification(updatedCampaign, currentCampaign.getCampaignName());
+            db.collection("users").document(volunteerId)
+                    .collection(getResources().getString(R.string.notifications_collection))
+                    .add(notification).addOnFailureListener(
+                    new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.e(EDIT_CAMPAIGN_TAG, e.getMessage());
+                        }
+                    });
+        }
     }
 }

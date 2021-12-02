@@ -2,11 +2,11 @@ package com.example.assignment2;
 
 import androidx.fragment.app.Fragment;
 
+import com.example.assignment2.models.User;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
-
-import java.util.ArrayList;
+import com.google.firebase.firestore.ListenerRegistration;
 
 public interface IMapManagement {
     public void UpdateBottomNavigationBar();
@@ -26,5 +26,6 @@ public interface IMapManagement {
     public Polyline getCurrentPolyline();
 
     public LatLng getUserLocation();
+    public ListenerRegistration getListenerRegistrationNotification();
 
 }

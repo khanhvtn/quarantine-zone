@@ -1,7 +1,12 @@
 <resources>
-    <string name="app_name">assignment2</string>
+    <string name="app_name">Quarantine Zone</string>
     <string name="title_activity_maps">MapsActivity</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="direction_api_key">AIzaSyAgyk-E0SUbCfv7xyxlJo5tQkElGXRqyzs</string>
+    <string name="channel_name">campaign notification</string>
+    <string name="channel_description">Notify new campaign information when it changes</string>
+    <string name="user_collection">users</string>
+    <string name="campaign_collection">campaigns</string>
+    <string name="notifications_collection">notifications</string>
 </resources>

@@ -1,21 +1,22 @@
 package com.example.assignment2;
 
-import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContract;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -27,27 +28,33 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.assignment2.directionhelpers.TaskLoadedCallback;
+import com.example.assignment2.fragments.GenerateReport;
+import com.example.assignment2.fragments.ListCampaign;
+import com.example.assignment2.fragments.Map;
+import com.example.assignment2.fragments.UserProfile;
+import com.example.assignment2.models.Campaign;
+import com.example.assignment2.models.User;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QuerySnapshot;
-
-import java.util.ArrayList;
 
 public class MapsActivity extends AppCompatActivity implements IMapManagement, TaskLoadedCallback,
         LocationListener {
+    private Integer idNotification = 1;
+    private final String CHANNEL_ID = "CAMPAIGN_NOTIFICATION";
     private final String MAP_ACTIVITY_TAG = "MapsActivity";
     private FirebaseAuth mAuth;
     private BottomNavigationView bottomNavigationView;
@@ -57,6 +64,11 @@ public class MapsActivity extends AppCompatActivity implements IMapManagement, T
     private Polyline currentPolyline;
     private LocationManager locationManager;
     private LatLng userLocationLatLng;
+    private NotificationManagerCompat notificationManager;
+    private Notification campaignNotification;
+    private NotificationCompat.Builder builder;
+    private ListenerRegistration
+            listenerRegistrationNotification;
 
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -65,6 +77,12 @@ public class MapsActivity extends AppCompatActivity implements IMapManagement, T
         Log.i(MAP_ACTIVITY_TAG, "onCreate");
         super.onCreate(savedInstanceState);
         getSupportActionBar().hide();
+
+        //create notification
+        notificationManager = NotificationManagerCompat.from(this);
+        createNotificationChannel();
+
+
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         ActivityResultLauncher<String[]> locationPermissionRequest =
                 registerForActivityResult(new ActivityResultContracts
@@ -145,7 +163,80 @@ public class MapsActivity extends AppCompatActivity implements IMapManagement, T
     protected void onStart() {
         Log.i(MAP_ACTIVITY_TAG, "onStart");
         super.onStart();
+        if (mAuth.getCurrentUser() != null) {
+            listenerRegistrationNotification =
+                    db.collection("users").document(mAuth.getCurrentUser().getUid())
+                            .collection(getResources().getString(R.string.notifications_collection))
+                            .addSnapshotListener(
+                                    new EventListener<QuerySnapshot>() {
+                                        @Override
+                                        public void onEvent(@Nullable QuerySnapshot value,
+                                                            @Nullable
+                                                                    FirebaseFirestoreException e) {
+                                            if (e != null) {
+                                                Log.w(MAP_ACTIVITY_TAG, "listen:error", e);
+                                                return;
+                                            }
 
+                                            for (DocumentChange dc : value.getDocumentChanges()) {
+                                                switch (dc.getType()) {
+                                                    case ADDED:
+//                                            Log.d(MAP_ACTIVITY_TAG, "New city: " + dc.getDocument().getData());
+
+                                                        String notificationId =
+                                                                dc.getDocument().getId();
+                                                        com.example.assignment2.models.Notification
+                                                                newNotification =
+                                                                dc.getDocument().toObject(
+                                                                        com.example.assignment2.models.Notification.class);
+                                                        String newInformation =
+                                                                GenerateNewCampaignInformation(
+                                                                        newNotification);
+                                                        builder = new NotificationCompat.Builder(
+                                                                MapsActivity.this, CHANNEL_ID)
+                                                                .setSmallIcon(R.drawable.app_logo)
+                                                                .setContentTitle(
+                                                                        newNotification
+                                                                                .getOldCampaignName() +
+                                                                                " has changed information")
+                                                                .setContentText(newInformation)
+                                                                .setStyle(
+                                                                        new NotificationCompat.BigTextStyle()
+                                                                                .bigText(
+                                                                                        newInformation))
+                                                                .setPriority(
+                                                                        NotificationCompat.PRIORITY_DEFAULT);
+                                                        campaignNotification = builder.build();
+                                                        notificationManager
+                                                                .notify(idNotification++,
+                                                                        campaignNotification);
+                                                        dc.getDocument().getReference().delete()
+                                                                .addOnFailureListener(
+                                                                        new OnFailureListener() {
+                                                                            @Override
+                                                                            public void onFailure(
+                                                                                    @NonNull
+                                                                                            Exception e) {
+                                                                                ToastMessage(
+                                                                                        e.getMessage());
+                                                                            }
+                                                                        });
+                                                        break;
+                                                    case MODIFIED:
+                                                        Log.d(MAP_ACTIVITY_TAG,
+                                                                "Modified city: " +
+                                                                        dc.getDocument().getData());
+                                                        break;
+                                                    case REMOVED:
+                                                        Log.d(MAP_ACTIVITY_TAG,
+                                                                "Removed city: " +
+                                                                        dc.getDocument().getData());
+                                                        break;
+                                                }
+                                            }
+                                        }
+                                    });
+        }
     }
 
 
@@ -246,6 +337,11 @@ public class MapsActivity extends AppCompatActivity implements IMapManagement, T
     }
 
     @Override
+    public ListenerRegistration getListenerRegistrationNotification() {
+        return listenerRegistrationNotification;
+    }
+
+    @Override
     public void onTaskDone(Object... values) {
 
         if (currentPolyline != null) {
@@ -264,5 +360,34 @@ public class MapsActivity extends AppCompatActivity implements IMapManagement, T
     @Override
     public void onLocationChanged(@NonNull Location location) {
         userLocationLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+    }
+
+    private void createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = getString(R.string.channel_name);
+            String description = getString(R.string.channel_description);
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+    private String GenerateNewCampaignInformation(
+            com.example.assignment2.models.Notification newNotification) {
+        Campaign campaign = newNotification.getNewInformation();
+        //generate new update information
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(String
+                .format("Campaign Name: %s\nOrganization: %s\nStart Date: %s\nNumber of Volunteers: %d\nNumber of Tested People: %d",
+                        campaign.getCampaignName(), campaign.getOrganization(),
+                        campaign.getStartDate(), campaign.getListVolunteers().size(),
+                        campaign.getNumberTestedPeople()));
+        return stringBuilder.toString();
     }
 }

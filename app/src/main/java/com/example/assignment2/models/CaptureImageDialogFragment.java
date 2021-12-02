@@ -1,4 +1,4 @@
-package com.example.assignment2;
+package com.example.assignment2.models;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -9,6 +9,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
+
+import com.example.assignment2.R;
 
 public class CaptureImageDialogFragment extends DialogFragment {
 

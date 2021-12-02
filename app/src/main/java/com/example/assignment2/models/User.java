@@ -1,4 +1,4 @@
-package com.example.assignment2;
+package com.example.assignment2.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
