@@ -238,6 +238,15 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
         }
     }
 
+
+    public ArrayList<Campaign> getBackupList() {
+        return backupList;
+    }
+
+    public void setBackupList(ArrayList<Campaign> backupList) {
+        this.backupList = backupList;
+    }
+
     public List<Campaign> getCampaignList() {
         return campaignList;
     }

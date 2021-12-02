@@ -49,6 +49,7 @@
         <entry key="app/src/main/res/layout/custom_item_search_campaign.xml" value="0.30512820512820515" />
         <entry key="app/src/main/res/layout/fragment_blank.xml" value="0.16770833333333332" />
         <entry key="app/src/main/res/layout/fragment_create_campaign.xml" value="0.21313593385006546" />
+        <entry key="app/src/main/res/layout/fragment_generate_report.xml" value="0.4540466392318244" />
         <entry key="app/src/main/res/layout/fragment_list_campaign.xml" value="0.21197916666666666" />
         <entry key="app/src/main/res/layout/fragment_login.xml" value="0.2418478260869565" />
         <entry key="app/src/main/res/layout/fragment_map.xml" value="0.165" />
