@@ -273,7 +273,7 @@ public class Map extends Fragment implements SearchView.OnQueryTextListener {
                                 btnMakeRoute.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        ToastMessage("Make Route");
+                                        ToastMessage("Make Route Successfully");
                                         new FetchURL(getContext()).execute(
                                                 getUrl(listener.getUserLocation(),
                                                         marker.getPosition(), "driving"),

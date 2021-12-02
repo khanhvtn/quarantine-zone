@@ -181,10 +181,6 @@ public class MapsActivity extends AppCompatActivity implements IMapManagement, T
                                             for (DocumentChange dc : value.getDocumentChanges()) {
                                                 switch (dc.getType()) {
                                                     case ADDED:
-//                                            Log.d(MAP_ACTIVITY_TAG, "New city: " + dc.getDocument().getData());
-
-                                                        String notificationId =
-                                                                dc.getDocument().getId();
                                                         com.example.assignment2.models.Notification
                                                                 newNotification =
                                                                 dc.getDocument().toObject(
@@ -194,7 +190,7 @@ public class MapsActivity extends AppCompatActivity implements IMapManagement, T
                                                                         newNotification);
                                                         builder = new NotificationCompat.Builder(
                                                                 MapsActivity.this, CHANNEL_ID)
-                                                                .setSmallIcon(R.drawable.app_logo)
+                                                                .setSmallIcon(R.drawable.icon_marker)
                                                                 .setContentTitle(
                                                                         newNotification
                                                                                 .getOldCampaignName() +
